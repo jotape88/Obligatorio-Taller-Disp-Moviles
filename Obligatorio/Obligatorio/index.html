@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Importamos las hojas de estilo y el JavaScript que nos dice la documentación de Onsen UI. -->
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+    <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+
+    <script type="text/javascript" src="js/jQuery.js"></script>
+    <script type="text/javascript" src="js/miCodigo.js"></script>
+    <title>Pantallas - Eventos de carga y pasaje de parámetros</title>
+</head>
+
+<body>
+
+    <!-- El componente splitter es el componente que sostiene la vista con el menu lateral.  -->
+    <ons-splitter>
+        <!-- El splitter side contiene la página del menú lateral. -->
+        <ons-splitter-side id="menu" side="left" width="220px" collapse swipeable>
+            <ons-page>
+                <ons-list>
+                    <ons-list-header id="menu-list-header">Usuario</ons-list-header>
+                    <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
+                    <ons-list-item onclick="verProducto(1)" tappable>Producto 1</ons-list-item>
+                    <ons-list-item onclick="verProducto(2)" tappable>Producto 2</ons-list-item>
+                    <ons-list-item onclick="verProducto(3)" tappable>Producto 3</ons-list-item>
+                    <ons-list-item onclick="verProducto(4)" tappable>Producto 4</ons-list-item>
+                    <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
+                    <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>
+                </ons-list>
+            </ons-page>
+        </ons-splitter-side>
+        <!-- El spliiter content contiene la pagina a mostrar. -->
+        <ons-splitter-content id="content">
+            <!--
+                    Dentro del spliiter content se carga el componente navigator que ya vimos, el cual se encargará de mostrar la página que quiero ver.
+                    Por defecto estoy indicando que muestre la home.
+                -->
+            <ons-navigator swipeable id="myNavigator" page="login.html"></ons-navigator>
+        </ons-splitter-content>
+    </ons-splitter>
+
+
+    <template id="login.html">
+        <ons-page>
+            <ons-toolbar>
+
+                <div class="left">
+                    <ons-toolbar-button id="btnMenuLogin" onclick="navegar('login', true)">
+                        Ingresar
+                    </ons-toolbar-button>
+                    <ons-toolbar-button id="btnMenuRegistro" onclick="navegar('registro', true)">
+                        Registrarse
+                    </ons-toolbar-button>
+                </div>
+
+            </ons-toolbar>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <h1>Login</h1>
+                <p>
+                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" float></ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" float></ons-input>
+                </p>
+
+                <p style="margin-top: 30px;">
+                    <ons-button id="btnLoginIniciarSesion" onclick="loginIniciarSesionHandler()">Iniciar Sesión</ons-button>
+                </p>
+                <br>
+                <p id="pLoginMensajes"></p>
+            </div>
+
+        </ons-page>
+    </template>
+
+    <template id="registro.html">
+        <ons-page>
+            <ons-toolbar>
+
+                <div class="left">
+                    <ons-toolbar-button id="btnMenuLogin" onclick="navegar('login', true)">
+                        Ingresar
+                    </ons-toolbar-button>
+                    <ons-toolbar-button id="btnMenuRegistro" onclick="navegar('registro', true)">
+                        Registrarse
+                    </ons-toolbar-button>
+                </div>
+
+            </ons-toolbar>
+
+
+            <div style="text-align: center; margin-top: 30px;">
+                <h1>Registro</h1>
+                <p>
+                    <ons-input id="txtRegistroEmail" modifier="underbar" placeholder="Email" float></ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtRegistroPassword" modifier="underbar" placeholder="Password" float></ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtRegistroRepPassword" modifier="underbar" placeholder="Repita el password" float>
+                    </ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtRegistroNombre" modifier="underbar" placeholder="Nombre" float></ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtRegistroApellido" modifier="underbar" placeholder="Apellido" float></ons-input>
+                </p>
+                <p>
+                    <ons-input id="txtRegistroDireccion" modifier="underbar" placeholder="Direccion" float></ons-input>
+                </p>
+
+                <p style="margin-top: 30px;">
+                    <ons-button id="btnLoginRegistro" onclick="registroRegistrarseHandler()" >Registrarse</ons-button>
+                </p>
+                <br>
+                <p id="pLoginMensajes"></p>
+            </div>
+
+        </ons-page>
+    </template>
+
+
+
+
+    <template id="home.html">
+        <ons-page>
+            <!-- El toolbar coloca en la parte superior una barra donde puedo poner botones, textos, íconos, etc. -->
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Home
+                </div>
+            </ons-toolbar>
+        </ons-page>
+    </template>
+
+    <template id="paginaProducto1.html">
+        <ons-page>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Producto 1
+                </div>
+            </ons-toolbar>
+            <ons-card>
+                <div class="title">
+                    Lorem Ipsum 1
+                </div>
+                <div class="content">
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam velit arcu, imperdiet eu sapien
+                        quis, maximus ultricies magna. Aenean efficitur maximus orci vel auctor. Nunc viverra elit vitae
+                        auctor elementum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac
+                        turpis egestas. Donec euismod felis magna, eu faucibus arcu dapibus eget. Curabitur rhoncus
+                        fringilla sem, at cursus elit lacinia eu. In in tincidunt mauris. In posuere, eros id viverra
+                        suscipit, turpis est ultricies ipsum, vitae sagittis urna est quis orci. Sed quis augue
+                        porttitor, dictum ipsum eu, ullamcorper tellus. Cras et risus a mauris blandit dapibus. Cras
+                        fringilla enim mauris, sed dictum turpis gravida ac. Sed quis elit eros. Morbi elementum rhoncus
+                        condimentum. Morbi lacinia purus vitae massa hendrerit accumsan. Maecenas pretium posuere
+                        dignissim.
+                    </p>
+                    <div>
+                        <ons-input id="inputCantidad1" modifier="underbar" placeholder="Cantidad" type="number" float>
+                        </ons-input>
+                        <ons-button numero-card="1" onclick="comprar(1)">Comprar</ons-button>
+                    </div>
+                </div>
+            </ons-card>
+        </ons-page>
+    </template>
+
+    <template id="paginaProducto2.html">
+        <ons-page>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Producto 2
+                </div>
+            </ons-toolbar>
+            <ons-card>
+                <div class="title">
+                    Lorem Ipsum 2
+                </div>
+                <div class="content">
+                    <p>
+                        Proin sollicitudin cursus lacus non porttitor. Duis ac porta lacus, nec placerat metus. Aenean
+                        at sem nisl. Vivamus interdum pretium pharetra. Nam diam metus, mattis et turpis sit amet,
+                        rutrum ultricies tellus. Suspendisse vel ex rhoncus, maximus velit vel, pretium nulla. Fusce
+                        porta porta ligula vitae consequat. Etiam lectus quam, posuere vitae sollicitudin nec, rhoncus
+                        non sapien. Nulla quis nibh luctus lorem ullamcorper porta et ut lectus. Sed mi risus, iaculis
+                        quis tincidunt id, malesuada ut ipsum. Vivamus in libero tristique, sodales elit imperdiet,
+                        interdum nisi. Suspendisse at arcu tincidunt, bibendum odio et, venenatis erat. Vestibulum in mi
+                        faucibus, mattis turpis ultricies, iaculis purus. Quisque sed arcu at sapien faucibus pharetra
+                        eu a sem. Etiam sit amet justo non lorem varius efficitur ut sit amet massa. Cras tempus aliquam
+                        libero, ac interdum erat tristique porta.
+                    </p>
+                    <div>
+                        <ons-input id="inputCantidad2" modifier="underbar" placeholder="Cantidad" type="number" float>
+                        </ons-input>
+                        <ons-button numero-card="2" onclick="comprar(2)">Comprar</ons-button>
+                    </div>
+                </div>
+            </ons-card>
+        </ons-page>
+    </template>
+
+    <template id="paginaProducto3.html">
+        <ons-page>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Producto 3
+                </div>
+            </ons-toolbar>
+            <ons-card>
+                <div class="title">
+                    Lorem Ipsum 3
+                </div>
+                <div class="content">
+                    <p>
+                        Nulla luctus molestie commodo. Vivamus pharetra vulputate neque, vel tincidunt arcu fermentum
+                        vel. Nullam dignissim, nisl vel dictum molestie, lacus odio dapibus odio, sed consectetur leo
+                        odio non dui. Nulla non feugiat felis. Vivamus est quam, scelerisque vel nisl sed, tincidunt
+                        bibendum ante. Vivamus ut risus ac lectus aliquet sodales. Quisque viverra consequat convallis.
+                        Sed ullamcorper malesuada orci at commodo. Vivamus congue convallis nisi eget egestas. Quisque
+                        pulvinar blandit lectus, nec semper urna tincidunt non. Nunc imperdiet enim ut blandit interdum.
+                    </p>
+                    <div>
+                        <ons-input id="inputCantidad3" modifier="underbar" placeholder="Cantidad" type="number" float>
+                        </ons-input>
+                        <ons-button numero-card="3" onclick="comprar(3)">Comprar</ons-button>
+                    </div>
+                </div>
+            </ons-card>
+        </ons-page>
+    </template>
+
+    <template id="paginaProducto4.html">
+        <ons-page>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Producto 4
+                </div>
+            </ons-toolbar>
+            <ons-card>
+                <div class="title">
+                    Lorem Ipsum 4
+                </div>
+                <div class="content">
+                    <p>
+                        Nunc nulla felis, vulputate sit amet iaculis ut, mollis ut purus. Curabitur facilisis risus
+                        vitae massa pellentesque, tincidunt efficitur ligula scelerisque. Donec libero libero, tincidunt
+                        id sagittis vehicula, semper quis urna. Fusce iaculis facilisis ex, nec dictum est ultrices a.
+                        Sed vestibulum, odio ac dictum iaculis, nisl metus interdum urna, eu tristique ipsum enim nec
+                        turpis. Aliquam sed justo condimentum, scelerisque augue nec, tempor felis. Pellentesque
+                        habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam vitae
+                        vulputate nibh.
+                    </p>
+                    <div>
+                        <ons-input id="inputCantidad4" modifier="underbar" placeholder="Cantidad" type="number" float>
+                        </ons-input>
+                        <ons-button numero-card="4" onclick="comprar(4)">Comprar</ons-button>
+                    </div>
+                </div>
+            </ons-card>
+        </ons-page>
+    </template>
+
+    <template id="detalleDeCompra.html">
+        <ons-page>
+            <script>
+                ons.getScriptPage().onInit = detalleCompraOnInit;
+                ons.getScriptPage().onShow = detalleCompraOnShow;
+                ons.getScriptPage().onHide = detalleCompraOnHide;
+                ons.getScriptPage().onDestroy = detalleCompraOnDestroy;
+            </script>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Detalle de compra
+                </div>
+            </ons-toolbar>
+            <p style="text-align: center; margin-top: 10px;">
+                <ons-search-input id="txtSearch" placeholder="Buscar por nombre" onchange=""></ons-search-input>
+
+                <ons-button style=" margin-bottom: -14px;" modifier="quiet" onclick="">
+                    <ons-icon style="font-size: 30px;  color: #2979ff;" icon="md-camera"></ons-icon>
+                </ons-button>
+            </p>
+            <ons-card>
+                <div class="title">
+                    Felicitaciones por su compra
+                </div>
+                <div class="content">
+                    <p id="pDetalleCompraMensaje"></p>
+                </div>
+            </ons-card>
+        </ons-page>
+    </template>
+</body>
+
+</html>

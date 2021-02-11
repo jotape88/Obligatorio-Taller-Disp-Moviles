@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+		<link rel="icon" href="data:,">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="js/jQuery.js"></script>
+        <script type="text/javascript" src="js/clases.js"></script>
+        <script type="text/javascript" src="js/miCodigo.js"></script>
+        <title>Ejercicio integrador - APP Recetas</title>
+    </head>
+    <body>
+        <div id="menu">
+            <input id="btnMenuLogin" type="button" value="Ingresar">
+            <input id="btnMenuRegistro" type="button" value="Registrarse">
+            <input id="btnMenuLogout" type="button" value="Cerrar Sesión">
+        </div>
+
+        <div id="divRegistro">
+            <h1>Registro de usuario</h1>
+            <label for="txtRegistroNombre">Nombre</label>
+            <input type="text" id="txtRegistroNombre">
+            <br><br>
+            <label for="txtRegistroApellido">Apellido</label>
+            <input type="text" id="txtRegistroApellido">
+            <br><br>
+            <label for="txtRegistroDireccion">Direccion</label>
+            <input type="text" id="txtRegistroDireccion">
+            <br><br>
+            <label for="txtRegistroEmail">Email</label>
+            <input type="text" id="txtRegistroEmail">
+            <br><br>
+            <label for="txtRegistroPassword">Password</label>
+            <input type="password" id="txtRegistroPassword">
+            <br><br>
+            <input type="button" value="Registrarse" id="btnRegistroRegistrarse">
+            <br>
+            <p id="pRegistroMensajes"></p>
+        </div>
+
+        <div id="divLogin">
+            <h1>Login</h1>
+            <label for="txtLoginEmail">Email</label>
+            <input type="text" id="txtLoginEmail">
+            <br><br>
+            <label for="txtLoginPassword">Password</label>
+            <input type="password" id="txtLoginPassword">
+            <br><br>
+            <input type="button" value="Iniciar Sesión" id="btnLoginIniciarSesion">
+            <br>
+            <p id="pLoginMensajes"></p>
+        </div>
+
+        <div id="divHome">
+            <h1>Home</h1>
+            <table id="tablaHomeRecetas" border="1">
+                <thead>
+                    <th>Foto</th>
+                    <th>Nombre</th>
+                    <th>Autor</th>
+                    <th>Fav.</th>
+                </thead>
+                <tbody id="tablaTbodyHomeRecetas">
+
+                </tbody>
+            </table>
+            <p id="pHomeMensajes"></p>
+        </div>
+
+        <div id="divDetalleReceta">
+            <input id="btnDetalleRecetaVolver" type="button" value="Volver">
+            <h1>Detalle de la receta</h1>
+            <div id="divDetalleRecetaContenido">
+                <h2 id="h2DetaleRecetaNombre"></h2>
+                <img id="imgDetalleRecetaImagen" onError="imgError(this);" src="" width="100">
+                <div>
+                    <table id="tablaDetalleRecetaIngredientes" border="1">
+                        <thead>
+                            <th>Ingredientes</th>
+                        </thead>
+                        <tbody id="tablaTbodyDetalleReceta"></tbody>
+                    </table>
+                    <h2>Preparación</h2>
+                    <p id="pDetalleRecetaPreparacion"></p>
+                    <h2>Otros datos</h2>
+                    <div id="divDetalleRecetaOtrosDatos"></div>
+                </div>
+            </div>
+            <p id="pDetalleRecetaMensajes"></p>
+        </div>
+    </body>
+</html>
+
