@@ -31,8 +31,8 @@
                     <ons-list-item onclick="cargarListadoProductos()" tappable>Catalogo</ons-list-item>
                     <ons-list-item onclick="verProducto(2)" tappable>Favoritos</ons-list-item>
                     <ons-list-item onclick="verProducto(3)" tappable>Pedidos</ons-list-item>
-                   
-                   <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
+
+                    <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
                     <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>-->
                 </ons-list>
             </ons-page>
@@ -66,14 +66,17 @@
             <div style="text-align: center; margin-top: 30px;">
                 <h1>Login</h1>
                 <p>
-                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" value="fcroce@k12.com" float></ons-input>
+                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" value="fcroce@k12.com" float>
+                    </ons-input>
                 </p>
                 <p>
-                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" value="hola1234"float></ons-input>
+                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" value="hola1234" float>
+                    </ons-input>
                 </p>
 
                 <p style="margin-top: 30px;">
-                    <ons-button id="btnLoginIniciarSesion" onclick="loginIniciarSesionHandler()">Iniciar Sesión</ons-button>
+                    <ons-button id="btnLoginIniciarSesion" onclick="loginIniciarSesionHandler()">Iniciar Sesión
+                    </ons-button>
                 </p>
                 <br>
                 <p id="pLoginMensajes"></p>
@@ -121,7 +124,7 @@
                 </p>
 
                 <p style="margin-top: 30px;">
-                    <ons-button id="btnLoginRegistro" onclick="registroRegistrarseHandler()" >Registrarse</ons-button>
+                    <ons-button id="btnLoginRegistro" onclick="registroRegistrarseHandler()">Registrarse</ons-button>
                 </p>
                 <br>
                 <p id="pLoginMensajes"></p>
@@ -158,6 +161,9 @@
 
     <template id="catalogo.html">
         <ons-page>
+            <script>
+                ons.getScriptPage().onShow = detalleCompraOnShow;
+            </script>
             <!-- El toolbar coloca en la parte superior una barra donde puedo poner botones, textos, íconos, etc. -->
             <ons-toolbar>
                 <div class="left">
@@ -173,8 +179,8 @@
                         Cerrar Sesion
                     </ons-toolbar-button>
                 </div>
-
             </ons-toolbar>
+            <div id="divProductosCatalogo"></div>
         </ons-page>
     </template>
 

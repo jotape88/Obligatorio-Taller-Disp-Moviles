@@ -229,8 +229,6 @@ function loginIniciarSesionHandler() {
 }
 
 function iniciarSesion(dataUsuario) {
-
-    alert(JSON.stringify(dataUsuario));
     usuarioLogueado = new Usuario(dataUsuario.data._id, dataUsuario.data.nombre, dataUsuario.data.apellido, dataUsuario.data.email, dataUsuario.data.direccion, null);
     tokenGuardado = dataUsuario.data.token;
     localStorage.setItem("APPRecetasToken", tokenGuardado);
@@ -240,7 +238,7 @@ function iniciarSesion(dataUsuario) {
 }
 
 /* Home */
-function cargarListadoProductos(despuesDeCargarListadoRecetas) {
+function cargarListadoProductos(despuesDeCargarListadoProductos) {
     $("#pHomeMensajes").html("");
 
     $.ajax({
@@ -256,41 +254,73 @@ function cargarListadoProductos(despuesDeCargarListadoRecetas) {
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
-        complete: despuesDeCargarListadoRecetas
+        complete: despuesDeCargarListadoProductos
     })
 }
 
+
+//TODO: BORRAR METODO
+
 function crearListadoProductos(dataProductos) {
-    navegar('catalogo', false);
-    // Vacío el array de recetas.
-    productos.splice(0, productos.length);
-    if (dataProductos && dataProductos.length > 0) {
-        // Si hay recetas completo y muestro la tabla.
-        let filas = ``;
-        for (let i = 0; i < dataProductos.length; i++) {
-            let unProducto = dataProductos[i];
-            //let usuarioRecetaObjeto = new Usuario(unaReceta.usuario._id, unaReceta.usuario.nombre, unaReceta.usuario.apellido, unaReceta.usuario.email, unaReceta.usuario.direccion, null);
-            let unProductoObjeto = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
-            // Agrego la receta a mi array de recetas.
-            productos.push(unProductoObjeto);
-            filas += `
-                <tr>
-                    <td><img onError="imgError(this);" src="${unProductoObjeto.urlImagen}" width="50"></td>
-                    <td class="tdRecetaNombre" productoId="${unProductoObjeto._id}">${unProductoObjeto.nombre}</td>
-                    <td><input class="btnRecetaFavorito" productoId="${unProductoObjeto._id}" type="button" value="${obtenerNombreBotonFavorito(unaRecetaObjeto)}"></td>
-                </tr>
-            `;
-        }
-        // TODO: Estaría bueno revisar los favoritos para ver si hay en favoritos alguna receta que ya no esté en la base de datos para borrarla.
-        $("#tablaTbodyHomeRecetas").html(filas);
-        $("#tablaHomeRecetas").show();
-        $(".btnRecetaFavorito").click(btnRecetaFavoritoHandler);
-        $(".tdRecetaNombre").click(tdRecetaNombreHandler);
-    } else {
-        // Si no hay recetas, aviso que no hay recetas.
-        $("#pHomeMensajes").html("No se encontraron recetas.");
-    }
+    //Navego al template Catalogo
+    navegar('catalogo', false, dataProductos);
+    
+     // Vacío el array de productos.
+     productos.splice(0, productos.length);
+
+     if (dataProductos && dataProductos.data.length > 0) {
+         
+            for(let i=0; i<dataProductos.data.length; i++){
+            let unProducto = dataProductos.data[i];
+            let card= `<ons-card> <div class="title">${unProducto.nombre}</div><div class="content"><p>${unProducto.foto}</p>
+            <p>${unProducto.precio}</p><p>${unProducto.etiquetas}</p><p>${unProducto.codigo}</p><p>${unProducto.estado}</p></div>
+            </ons-card>`
+
+            console.log(card);
+
+            $("#divProductosCatalogo").append(card);
+            }
+     }
 }
+
+function detalleCompraOnShow(){
+    alert("este es el onshow")
+}
+
+// function crearListadoProductos(dataProductos) {
+//     navegar('catalogo', false);
+//     // Vacío el array de recetas.
+//     productos.splice(0, productos.length);
+//     if (dataProductos && dataProductos.length > 0) {
+//         // Si hay recetas completo y muestro la tabla.
+//         let filas = ``;
+//         for (let i = 0; i < dataProductos.length; i++) {
+//             let unProducto = dataProductos[i];
+//             //let usuarioRecetaObjeto = new Usuario(unaReceta.usuario._id, unaReceta.usuario.nombre, unaReceta.usuario.apellido, unaReceta.usuario.email, unaReceta.usuario.direccion, null);
+//             let unProductoObjeto = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
+//             // Agrego la receta a mi array de recetas.
+//             productos.push(unProductoObjeto);
+//             filas += `
+//                 <tr>
+//                     <td><img onError="imgError(this);" src="${unProductoObjeto.urlImagen}" width="50"></td>
+//                     <td class="tdRecetaNombre" productoId="${unProductoObjeto._id}">${unProductoObjeto.nombre}</td>
+//                     <td><input class="btnRecetaFavorito" productoId="${unProductoObjeto._id}" type="button" value="${obtenerNombreBotonFavorito(unaRecetaObjeto)}"></td>
+//                 </tr>
+//             `;
+//         }
+//         // TODO: Estaría bueno revisar los favoritos para ver si hay en favoritos alguna receta que ya no esté en la base de datos para borrarla.
+//         $("#tablaTbodyHomeRecetas").html(filas);
+//         $("#tablaHomeRecetas").show();
+//         $(".btnRecetaFavorito").click(btnRecetaFavoritoHandler);
+//         $(".tdRecetaNombre").click(tdRecetaNombreHandler);
+//     } else {
+//         // Si no hay recetas, aviso que no hay recetas.
+//         $("#pHomeMensajes").html("No se encontraron recetas.");
+//     }
+// }
+
+
+
 
 /**
  * Función que se encarga de sustituir el src de las imágenes por la de placeholder en caso de tener un src inválido.
