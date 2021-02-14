@@ -61,19 +61,23 @@ function inicializar() {
  * Variables globales
  ******************************/
 // API
-const urlBase = 'https://recetas-api-taller.herokuapp.com/api/';
+const urlBase = 'http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/';
 // Sesión
 let usuarioLogueado;
 let tokenGuardado;
-// Recetas
-const recetas = [];
+// Productos
+const productos = [];
 
 /******************************
  * Funcionalidades del sistema
  ******************************/
 /* Menu */
 
-
+// Función para abrir el menú.
+function abrirMenu() {
+    // No puedo seleccionar el elemento con $("#menu") porque la función .open() no es de jQuery.
+    document.querySelector("#menu").open();
+}
 
 function vaciarTodosLosCampos() {
     // Registro
@@ -155,7 +159,8 @@ function cerrarSesion() {
     // window.localStorage.removeItem("APPRecetasToken");
     // Así vacío todo lo que haya guardado.
     window.localStorage.clear();
-    inicializar();
+    //inicializar();
+    navegar('login', true);
 }
 
 /* Registro */
@@ -174,11 +179,12 @@ function registroRegistrarseHandler() {
     // El password debe tener como mínimo 8 caracteres.
     // El correo debe tener un formato válido.
     // El correo debe ser único en el sistema (no se puede validar). 
+
     const datosUsuario = {
         nombre: nombreIngresado,
         apellido: apellidoIngresado,
-        direccion: direccionIngresada,
         email: emailIngresado,
+        direccion: direccionIngresada,
         password: passwordIngresado
     };
 
@@ -223,8 +229,10 @@ function loginIniciarSesionHandler() {
 }
 
 function iniciarSesion(dataUsuario) {
-    usuarioLogueado = new Usuario(dataUsuario._id, dataUsuario.nombre, dataUsuario.apellido, dataUsuario.email, dataUsuario.direccion, null);
-    tokenGuardado = dataUsuario.token;
+
+    alert(JSON.stringify(dataUsuario));
+    usuarioLogueado = new Usuario(dataUsuario.data._id, dataUsuario.data.nombre, dataUsuario.data.apellido, dataUsuario.data.email, dataUsuario.data.direccion, null);
+    tokenGuardado = dataUsuario.data.token;
     localStorage.setItem("APPRecetasToken", tokenGuardado);
     //mostrarHome();
     //mostrarMenuUsuarioAutenticado();
@@ -232,12 +240,12 @@ function iniciarSesion(dataUsuario) {
 }
 
 /* Home */
-function cargarListadoRecetas(despuesDeCargarListadoRecetas) {
+function cargarListadoProductos(despuesDeCargarListadoRecetas) {
     $("#pHomeMensajes").html("");
 
     $.ajax({
         type: 'GET',
-        url: urlBase + 'recetas',
+        url: urlBase + 'productos',
         /**
          * El beforeSend lo uso para cargar el token en el header de la petición y
          * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
@@ -246,30 +254,30 @@ function cargarListadoRecetas(despuesDeCargarListadoRecetas) {
          * es un header personalizado (usualmente comienzan por x-).
          */
         beforeSend: cargarTokenEnRequest,
-        success: crearListadoRecetas,
+        success: crearListadoProductos,
         error: errorCallback,
         complete: despuesDeCargarListadoRecetas
     })
 }
 
-function crearListadoRecetas(dataRecetas) {
+function crearListadoProductos(dataProductos) {
+    navegar('catalogo', false);
     // Vacío el array de recetas.
-    recetas.splice(0, recetas.length);
-    if (dataRecetas && dataRecetas.length > 0) {
+    productos.splice(0, productos.length);
+    if (dataProductos && dataProductos.length > 0) {
         // Si hay recetas completo y muestro la tabla.
         let filas = ``;
-        for (let i = 0; i < dataRecetas.length; i++) {
-            let unaReceta = dataRecetas[i];
-            let usuarioRecetaObjeto = new Usuario(unaReceta.usuario._id, unaReceta.usuario.nombre, unaReceta.usuario.apellido, unaReceta.usuario.email, unaReceta.usuario.direccion, null);
-            let unaRecetaObjeto = new Receta(unaReceta._id, unaReceta.fecha, unaReceta.nombre, unaReceta.ingredientes, unaReceta.preparacion, unaReceta.urlImagen, usuarioRecetaObjeto);
+        for (let i = 0; i < dataProductos.length; i++) {
+            let unProducto = dataProductos[i];
+            //let usuarioRecetaObjeto = new Usuario(unaReceta.usuario._id, unaReceta.usuario.nombre, unaReceta.usuario.apellido, unaReceta.usuario.email, unaReceta.usuario.direccion, null);
+            let unProductoObjeto = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
             // Agrego la receta a mi array de recetas.
-            recetas.push(unaRecetaObjeto);
+            productos.push(unProductoObjeto);
             filas += `
                 <tr>
-                    <td><img onError="imgError(this);" src="${unaRecetaObjeto.urlImagen}" width="50"></td>
-                    <td class="tdRecetaNombre" recetaId="${unaRecetaObjeto._id}">${unaRecetaObjeto.nombre}</td>
-                    <td>${unaRecetaObjeto.usuario.nombre}</td>
-                    <td><input class="btnRecetaFavorito" recetaId="${unaRecetaObjeto._id}" type="button" value="${obtenerNombreBotonFavorito(unaRecetaObjeto)}"></td>
+                    <td><img onError="imgError(this);" src="${unProductoObjeto.urlImagen}" width="50"></td>
+                    <td class="tdRecetaNombre" productoId="${unProductoObjeto._id}">${unProductoObjeto.nombre}</td>
+                    <td><input class="btnRecetaFavorito" productoId="${unProductoObjeto._id}" type="button" value="${obtenerNombreBotonFavorito(unaRecetaObjeto)}"></td>
                 </tr>
             `;
         }

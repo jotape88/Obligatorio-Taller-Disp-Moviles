@@ -12,7 +12,9 @@
     <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
 
     <script type="text/javascript" src="js/jQuery.js"></script>
+    <script type="text/javascript" src="js/clases.js"></script>
     <script type="text/javascript" src="js/miCodigo.js"></script>
+
     <title>Pantallas - Eventos de carga y pasaje de parámetros</title>
 </head>
 
@@ -26,12 +28,12 @@
                 <ons-list>
                     <ons-list-header id="menu-list-header">Usuario</ons-list-header>
                     <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
-                    <ons-list-item onclick="verProducto(1)" tappable>Producto 1</ons-list-item>
-                    <ons-list-item onclick="verProducto(2)" tappable>Producto 2</ons-list-item>
-                    <ons-list-item onclick="verProducto(3)" tappable>Producto 3</ons-list-item>
-                    <ons-list-item onclick="verProducto(4)" tappable>Producto 4</ons-list-item>
-                    <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
-                    <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>
+                    <ons-list-item onclick="cargarListadoProductos()" tappable>Catalogo</ons-list-item>
+                    <ons-list-item onclick="verProducto(2)" tappable>Favoritos</ons-list-item>
+                    <ons-list-item onclick="verProducto(3)" tappable>Pedidos</ons-list-item>
+                   
+                   <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
+                    <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>-->
                 </ons-list>
             </ons-page>
         </ons-splitter-side>
@@ -64,10 +66,10 @@
             <div style="text-align: center; margin-top: 30px;">
                 <h1>Login</h1>
                 <p>
-                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" float></ons-input>
+                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" value="fcroce@k12.com" float></ons-input>
                 </p>
                 <p>
-                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" float></ons-input>
+                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" value="hola1234"float></ons-input>
                 </p>
 
                 <p style="margin-top: 30px;">
@@ -143,6 +145,35 @@
                 <div class="center">
                     Home
                 </div>
+                <div class="right">
+                    <ons-toolbar-button onclick="cerrarSesion()">
+                        Cerrar Sesion
+                    </ons-toolbar-button>
+                </div>
+
+            </ons-toolbar>
+        </ons-page>
+    </template>
+
+
+    <template id="catalogo.html">
+        <ons-page>
+            <!-- El toolbar coloca en la parte superior una barra donde puedo poner botones, textos, íconos, etc. -->
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Catalogo de productos
+                </div>
+                <div class="right">
+                    <ons-toolbar-button onclick="cerrarSesion()">
+                        Cerrar Sesion
+                    </ons-toolbar-button>
+                </div>
+
             </ons-toolbar>
         </ons-page>
     </template>
