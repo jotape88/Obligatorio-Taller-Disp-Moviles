@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 /******************************
  * Inicialización
  ******************************/
@@ -225,7 +227,7 @@ function loginIniciarSesionHandler() {
         data: JSON.stringify(datosUsuario),
         success: iniciarSesion,
         error: errorCallback
-    })
+    });
 }
 
 function iniciarSesion(dataUsuario) {
@@ -239,8 +241,6 @@ function iniciarSesion(dataUsuario) {
 
 /* Home */
 function cargarListadoProductos(despuesDeCargarListadoProductos) {
-    $("#pHomeMensajes").html("");
-
     $.ajax({
         type: 'GET',
         url: urlBase + 'productos',
@@ -255,7 +255,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
         success: crearListadoProductos,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
-    })
+    });
 }
 
 
@@ -263,29 +263,64 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
 
 function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
-    navegar('catalogo', false, dataProductos);
-    
-     // Vacío el array de productos.
+    //navegar('catalogo', false, dataProductos); - **Si dejaba el navegar aca, entraba en un loop eterno***
+    // Vacío el array de productos.
      productos.splice(0, productos.length);
-
      if (dataProductos && dataProductos.data.length > 0) {
-         
-            for(let i=0; i<dataProductos.data.length; i++){
+        for(let i=0; i<dataProductos.data.length; i++){
+            //let urlImagen = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${producto.urlImagen}.jpg`;       
             let unProducto = dataProductos.data[i];
-            let card= `<ons-card> <div class="title">${unProducto.nombre}</div><div class="content"><p>${unProducto.foto}</p>
-            <p>${unProducto.precio}</p><p>${unProducto.etiquetas}</p><p>${unProducto.codigo}</p><p>${unProducto.estado}</p></div>
-            </ons-card>`
-
-            console.log(card);
-
-            $("#divProductosCatalogo").append(card);
-            }
+            //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
+            let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
+            let unaCard = `
+            <ons-card>
+                <div class="title">
+                    ${unProducto.nombre}
+                </div>
+                <div>
+                    <ons-button>
+                        <i class="fas fa-heart"></i> 
+                    </ons-button>
+                <div>
+                </div>
+                <ons-list>
+                    <ons-list-header>Precio:</ons-list-header>
+                    <ons-list-item>$${unProducto.precio}</ons-list-item> 
+                    <ons-list-header>Foto:</ons-list-header>
+                    <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
+                    <ons-list-header>Código:</ons-list-header>
+                    <ons-list-item>${unProducto.codigo}</ons-list-item>
+                    <ons-list-header>Etiquetas:</ons-list-header>
+                    <ons-list-item>${unProducto.etiquetas}</ons-list-item>
+                    <ons-list-header>Estado:</ons-list-header>
+                    <ons-list-item>${unProducto.estado}</ons-list-item>
+                </ons-list>
+                </div>
+            </ons-card>`;
+            $("#divProductosCatalogo").append(unaCard);
+        }
      }
 }
 
-function detalleCompraOnShow(){
-    alert("este es el onshow")
-}
+// function catalogoProductosOnShow(){
+//     console.log("catalogo onShow")
+//     cargarListadoProductos();
+// }
+
+// function cargarListadoProductos(){
+
+// }
+
+// function cargarDetalleCatalogo(){
+//     const datos = myNavigator.topPage.data;
+//     console.log(datos);
+//     //const mensaje = `Se mostro ${datos.Usuario}`;
+
+// }
+
+// function detalleCompraOnShow(){
+//     alert("este es el onshow")
+// }
 
 // function crearListadoProductos(dataProductos) {
 //     navegar('catalogo', false);
