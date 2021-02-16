@@ -7,7 +7,7 @@ ons.ready(todoCargado);
 
 function todoCargado() {
     yNavigator = document.querySelector('#myNavigator');
-    // inicializar();
+    inicializar(); //TODO: descomente esta funcion para acceder al token guardado y logear automaticamente al usuario en caso de que el token este guardado en el localstorage
 }
 
 function navegar(paginaDestino, resetStack, datos) {
@@ -42,19 +42,18 @@ function agregarEventosEnBotones() {
 // Oculto todo y muestro lo que corresponda.
 function inicializar() {
     // Oculto todo.
-    ocultarSecciones();
-    ocultarOpcionesMenu();
+    //ocultarSecciones();
+    //ocultarOpcionesMenu();
     // Chequeo si en el localStorage hay token guardado.
     tokenGuardado = window.localStorage.getItem("APPRecetasToken");
     // Al chequeo de la sesión, le paso como parámetro una función anónima que dice qué hacer después.
     chequearSesion(function () {
         // Muestro lo que corresponda en base a si hay o no usuario logueado.
         if (!usuarioLogueado) {
-            mostrarLogin();
-            mostrarMenuInvitado();
+            navegar('login', true);         
+            //mostrarMenuInvitado();
         } else {
-            mostrarHome();
-            mostrarMenuUsuarioAutenticado();
+            navegar('home', false);
         }
     });
 }
@@ -122,7 +121,6 @@ function mostrarDetalleReceta(recetaId) {
 function chequearSesion(despuesDeChequearSesion) {
     // Asumo que no hay usuario logueado y en caso de que si, lo actualizo.
     usuarioLogueado = null;
-
     if (tokenGuardado) {
         // Hago la llamada ajax usando el endpoint de validación de token que me retorna el usuario.
         $.ajax({
@@ -160,7 +158,7 @@ function cerrarSesion() {
     // Así remuevo específicamente el token guardado.
     // window.localStorage.removeItem("APPRecetasToken");
     // Así vacío todo lo que haya guardado.
-    window.localStorage.clear();
+    window.localStorage.removeItem("APPRecetasToken", JSON.stringify(tokenGuardado)); // reemplace el .clear xq tambien borra los favoritos al borrar el token
     //inicializar();
     navegar('login', true);
 }
@@ -289,7 +287,7 @@ function filtrarProductosXNombre(despuesDeCargarListadoProductos){
 
 function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
-    //navegar('catalogo', false, dataProductos); - **Si dejaba el navegar aca, entraba en un loop eterno***
+    //navegar('catalogo', false, dataProductos); - **llamando al catalogo entra en un loop infinito***
     // Vacío el array de productos.
      productos.splice(0, productos.length);
      if (dataProductos && dataProductos.data.length > 0) {
@@ -368,12 +366,11 @@ function crearListadoProductos(dataProductos) {
 // }
 
 
-
-
 /**
  * Función que se encarga de sustituir el src de las imágenes por la de placeholder en caso de tener un src inválido.
  * Se ejecuta desde el evento onError de las etiquetas img.
  */
+
 function imgError(img) {
     $(img).attr("src", "./img/recetas/placeholder.png");
 }
