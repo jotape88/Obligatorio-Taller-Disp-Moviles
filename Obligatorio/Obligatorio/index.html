@@ -182,15 +182,19 @@
                 <div class="center">
                     Catalogo de productos
                 </div>
+                <!--TODO: Al cambiar la pagina y volver al catalogo, no se muestran los productos-->
                 <div class="right">
                     <ons-toolbar-button onclick="cerrarSesion()">
                         Cerrar Sesion
                     </ons-toolbar-button>
                 </div>
-            </ons-toolbar>          
+            </ons-toolbar>
+            
+            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Filtro por nombre" value="" float></ons-search-input>        
+            <ons-button class="button button--material--flat" id="btnFiltroProductos" onclick="filtrarProductosXNombre()">Filtrar</ons-button>
+            
             <div id="divProductosCatalogo">
             </div>
-
         </ons-page>
     </template>
 

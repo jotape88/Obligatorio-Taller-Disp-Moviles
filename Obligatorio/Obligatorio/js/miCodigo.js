@@ -3,7 +3,7 @@
 /******************************
  * Inicialización
  ******************************/
-ons.ready(todoCargado)
+ons.ready(todoCargado);
 
 function todoCargado() {
     yNavigator = document.querySelector('#myNavigator');
@@ -12,9 +12,9 @@ function todoCargado() {
 
 function navegar(paginaDestino, resetStack, datos) {
     if (resetStack) {
-        myNavigator.resetToPage(`${paginaDestino}.html`)
+        myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
-        myNavigator.pushPage(`${paginaDestino}.html`, { data: datos })
+        myNavigator.pushPage(`${paginaDestino}.html`, { data: datos });
     }
     cerrarMenu();
 }
@@ -198,10 +198,10 @@ function registroRegistrarseHandler() {
         // Lo que se debe hacer es tan poco, que lo dejo en una función anónima.
         success: function () {
             alert("El usuario ha sido creado correctamente");
-            navegar('login', true)
+            navegar('login', true);
         },
         error: errorCallback
-    })
+    });
 }
 
 /* Login */
@@ -236,7 +236,7 @@ function iniciarSesion(dataUsuario) {
     localStorage.setItem("APPRecetasToken", tokenGuardado);
     //mostrarHome();
     //mostrarMenuUsuarioAutenticado();
-    navegar('home', true, dataUsuario)
+    navegar('home', true, dataUsuario);
 }
 
 /* Home */
@@ -251,12 +251,38 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
          * Esto se debe hacer porque el header mediante el que se manda el token
          * es un header personalizado (usualmente comienzan por x-).
          */
+
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
     });
 }
+
+//TODO: Codigo repetido?
+function filtrarProductosXNombre(despuesDeCargarListadoProductos){
+    $("#divProductosCatalogo").html("");
+    let texto = $("#txtFiltroProductos").val();
+    $.ajax({
+        type: 'GET',
+        url: urlBase + 'productos',
+        /**
+         * El beforeSend lo uso para cargar el token en el header de la petición y
+         * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
+         * ejecutar antes de enviar la petición (beforeSend).
+         * Esto se debe hacer porque el header mediante el que se manda el token
+         * es un header personalizado (usualmente comienzan por x-).
+         */
+        data: {
+            nombre: texto
+            },
+        beforeSend: cargarTokenEnRequest,
+        success: crearListadoProductos,
+        error: errorCallback,
+        complete: despuesDeCargarListadoProductos
+    });
+}
+
 
 
 //TODO: BORRAR METODO
@@ -267,40 +293,27 @@ function crearListadoProductos(dataProductos) {
     // Vacío el array de productos.
      productos.splice(0, productos.length);
      if (dataProductos && dataProductos.data.length > 0) {
-        for(let i=0; i<dataProductos.data.length; i++){
-            //let urlImagen = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${producto.urlImagen}.jpg`;       
+        for(let i=0; i<dataProductos.data.length; i++){      
             let unProducto = dataProductos.data[i];
             //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
-            let unaCard = `
-            <ons-card>
-                <div class="title">
-                    ${unProducto.nombre}
-                </div>
-                <div>
-                    <ons-button>
-                        <i class="fas fa-heart"></i> 
-                    </ons-button>
-                <div>
-                </div>
+            let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
-                    <ons-list-header>Precio:</ons-list-header>
-                    <ons-list-item>$${unProducto.precio}</ons-list-item> 
-                    <ons-list-header>Foto:</ons-list-header>
+                    <ons-list-item tappable>
                     <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
-                    <ons-list-header>Código:</ons-list-header>
-                    <ons-list-item>${unProducto.codigo}</ons-list-item>
-                    <ons-list-header>Etiquetas:</ons-list-header>
-                    <ons-list-item>${unProducto.etiquetas}</ons-list-item>
-                    <ons-list-header>Estado:</ons-list-header>
-                    <ons-list-item>${unProducto.estado}</ons-list-item>
+                    <ons-list-item>Precio: $${unProducto.precio}</ons-list-item> 
+                    <ons-list-item>Código: ${unProducto.codigo}</ons-list-item>
+                    <ons-list-item>Etiquetas: ${unProducto.etiquetas}</ons-list-item>
+                    <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
+                    </ons-list-item>
                 </ons-list>
-                </div>
-            </ons-card>`;
+                </ons-card>`;
             $("#divProductosCatalogo").append(unaCard);
         }
-     }
+    }
 }
+
+
 
 // function catalogoProductosOnShow(){
 //     console.log("catalogo onShow")
@@ -444,7 +457,7 @@ function cargarDetalleReceta(recetaId, despuesDeCargarDetalleReceta) {
             success: actualizarDetalleReceta,
             error: errorCallback,
             complete: despuesDeCargarDetalleReceta
-        })
+        });
     } else {
         $("#pDetalleRecetaMensajes").html("Ha ocurrido un error al cargar los datos de la receta.");
         despuesDeCargarDetalleReceta();
