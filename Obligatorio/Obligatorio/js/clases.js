@@ -19,22 +19,21 @@ class Usuario {
 
 
 class Producto{
-   
     constructor(
-    codigo,
-    nombre,
-    precio,
-    urlImagen,
-    estado,
-    etiquetas
-    )
-    {
-    this.codigo = codigo;
-    this.nombre = nombre;
-    this.precio = precio;
-    this.urlImagen= urlImagen;
-    this.estado = estado;
-    this.etiquetas = etiquetas;
+        p_Id,
+        pCodigo,
+        pNombre,
+        pPrecio,
+        pUrlImagen,
+        pEstado,
+        pEtiquetas
+    ) {
+        this._id = p_Id;
+        this.codigo = pCodigo;
+        this.nombre = pNombre;
+        this.precio = pPrecio;
+        this.urlImagen= pUrlImagen;
+        this.estado = pEstado;
+        this.etiquetas = pEtiquetas;
     }
-
 }
