@@ -24,20 +24,7 @@ function navegarAtras() {
     cerrarMenu();
 }
 
-//TODO: Borrar esta funcion
-// Agrego evento a los botones del menú y de las pantallas.
-function agregarEventosEnBotones() {
-    // Menu
-    $("#btnMenuLogin").click(menuLoginHandler);
-    $("#btnMenuRegistro").click(menuRegistroHandler);
-    $("#btnMenuLogout").click(menuLogoutHandler);
-    // Registro
-    $("#btnRegistroRegistrarse").click(registroRegistrarseHandler);
-    // Login
-    $("#btnLoginIniciarSesion").click(loginIniciarSesionHandler);
-    // Detalle receta
-    $("#btnDetalleRecetaVolver").click(function () { mostrarHome(); });
-}
+
 
 // Oculto todo y muestro lo que corresponda.
 function inicializar() {
@@ -50,7 +37,7 @@ function inicializar() {
     chequearSesion(function () {
         // Muestro lo que corresponda en base a si hay o no usuario logueado.
         if (!usuarioLogueado) {
-            navegar('login', true);         
+            navegar('login', true);
             //mostrarMenuInvitado();
         } else {
             navegar('home', false);
@@ -260,7 +247,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
 }
 
 //TODO: Codigo repetido?
-function filtrarProductosXNombre(despuesDeCargarListadoProductos){
+function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
     $.ajax({
@@ -275,7 +262,7 @@ function filtrarProductosXNombre(despuesDeCargarListadoProductos){
          */
         data: {
             nombre: texto
-            },
+        },
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
@@ -291,9 +278,9 @@ function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
     //navegar('catalogo', false, dataProductos); - **llamando al catalogo entra en un loop infinito***
     // Vacío el array de productos.
-     productos.splice(0, productos.length);
-     if (dataProductos && dataProductos.data.length > 0) {
-        for(let i=0; i<dataProductos.data.length; i++){      
+    productos.splice(0, productos.length);
+    if (dataProductos && dataProductos.data.length > 0) {
+        for (let i = 0; i < dataProductos.data.length; i++) {
             let unProducto = dataProductos.data[i];
             //TODO: revisar, pusheamos todos los productos que recibimos de la api en la constante productos, para que podamos buscar un producto x id
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
@@ -310,12 +297,17 @@ function crearListadoProductos(dataProductos) {
                     <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
                     </ons-list-item>
                 </ons-list>
+                <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='navegar(detalleProducto, false, unProducto)'>Ver producto</ons-button>
                 </ons-card>`;
+            /*TODO: cuando agrego ${} a la funcion en el onclick, no carga los productos en el catalogo*/
             $("#divProductosCatalogo").append(unaCard);
+
         }
         $(".filaLista").click(btnProductoFavoritoHandler);
+
     }
 }
+
 
 
 
@@ -448,8 +440,65 @@ function obtenerProductoPorID(idProducto) {
     return producto;
 }
 
+function cargarDetalleProducto(despuesDeCargarElProducto) {
 
+    const miProducto = myNavigator.topPage.data;
+    alert(JSON.stringify(miProducto));
 
+    const idProducto = miProducto._id;
+
+    if (idProducto) {
+        $.ajax({
+            type: 'GET',
+            url: urlBase + `/productos/${idProducto}`,
+            /**
+             * El beforeSend lo uso para cargar el token en el header de la petición y
+             * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
+             * ejecutar antes de enviar la petición (beforeSend).
+             * Esto se debe hacer porque el header mediante el que se manda el token
+             * es un header personalizado (usualmente comienzan por x-).
+             */
+
+            beforeSend: cargarTokenEnRequest,
+            success: verDetalleProducto,
+            error: errorCallback,
+            complete: despuesDeCargarElProducto
+        });
+
+    } else {
+        const opciones = {
+            title: 'Error'
+        };
+        mensaje = 'Ocurrió un error al cargar el producto';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
+
+function verDetalleProducto(dataProducto) {
+
+    const miProducto = dataProducto.data;
+
+    const unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${miProducto.urlImagen}.jpg`;
+
+    let unaCard = `<ons-card><div class="title">${miProducto.nombre}</div>
+        <ons-list>
+            <ons-list-item tappable>
+            <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
+            <ons-list-item>Precio: $${miProducto.precio}</ons-list-item> 
+            <ons-list-item>Código: ${miProducto.codigo}</ons-list-item>
+            <ons-list-item>Etiquetas: ${miProducto.etiquetas}</ons-list-item>
+            <ons-list-item>Estado: ${miProducto.estado}</ons-list-item>
+            <ons-list-item>Descripcion: ${miProducto.descripcion}</ons-list-item>
+            <ons-list-item>Descripcion: ${miProducto.putaje}</ons-list-item>
+            </ons-list-item>
+        </ons-list>`
+
+    if (miProducto.estado == "en stock") {
+        unaCard += `<ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick="">Comprar</ons-button>
+        </ons-card>`;
+    }
+    $("#divDetalleProductos").html(unaCard);
+}
 
 // function tdRecetaNombreHandler() {
 //     let recetaId = $(this).attr("recetaId");
