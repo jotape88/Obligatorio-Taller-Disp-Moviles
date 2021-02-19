@@ -29,7 +29,7 @@
                     <ons-list-header id="menu-list-header">Usuario</ons-list-header>
                     <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
                     <ons-list-item onclick="navegar('catalogo', false)" tappable>Catalogo</ons-list-item> <!--Saque la funcion que llama al listado, y agregue un navegar directo a el template del catalogo-->
-                    <ons-list-item onclick="verProducto(2)" tappable>Favoritos</ons-list-item>
+                    <ons-list-item onclick="navegar('favoritos', false)" tappable>Favoritos</ons-list-item>
                     <ons-list-item onclick="verProducto(3)" tappable>Pedidos</ons-list-item>
 
                     <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
@@ -194,6 +194,40 @@
             <ons-button class="button button--material--flat" id="btnFiltroProductos" onclick="filtrarProductosXNombre()">Filtrar</ons-button>
             
             <div id="divProductosCatalogo">
+            </div>
+        </ons-page>
+    </template>
+
+    <template id="favoritos.html">
+        <ons-page>
+            <script>        
+                ons.getScriptPage().onShow = crearListadoFavoritos;
+            </script>
+            <script>
+                document.addEventListener('init', function(event) {
+                  if (event.target.matches('#favoritos')) {
+                    ons.notification.alert('Page 1 is initiated.');
+                    // Set up content...
+                  }
+                }, false);
+                </script>
+            <!-- El toolbar coloca en la parte superior una barra donde puedo poner botones, textos, íconos, etc. -->
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Listado de Favoritos
+                </div>
+                <div class="right">
+                    <ons-toolbar-button onclick="cerrarSesion()">
+                        Cerrar Sesion
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>          
+            <div id="divFavoritos">
             </div>
         </ons-page>
     </template>
