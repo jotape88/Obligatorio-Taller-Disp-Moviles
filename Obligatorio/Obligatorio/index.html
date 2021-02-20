@@ -211,7 +211,6 @@
             <script>
                 ons.getScriptPage().onShow = cargarDetalleProducto;
             </script>
-            <!-- TODO: Ver bien que es lo que hace esto-->
             <script>
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {
@@ -220,7 +219,7 @@
                     }
                 }, false);
             </script>
-                        <ons-toolbar>
+            <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="abrirMenu()">
                         <ons-icon icon="md-menu"></ons-icon>
@@ -244,12 +243,17 @@
     <template id="detalleDeCompra.html">
         <ons-page>
             <script>
-                ons.getScriptPage().onInit = detalleCompraOnInit;
-                ons.getScriptPage().onShow = detalleCompraOnShow;
-                ons.getScriptPage().onHide = detalleCompraOnHide;
-                ons.getScriptPage().onDestroy = detalleCompraOnDestroy;
+                ons.getScriptPage().onShow = cargarDetalleCompra;
             </script>
-            <ons-toolbar>
+            <script>
+                document.addEventListener('init', function (event) {
+                    if (event.target.matches('#detalleProducto')) {
+                        ons.notification.alert('Page 1 is initiated.');
+                        // Set up content...
+                    }
+                }, false);
+            </script>
+             <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="abrirMenu()">
                         <ons-icon icon="md-menu"></ons-icon>
@@ -257,6 +261,11 @@
                 </div>
                 <div class="center">
                     Detalle de compra
+                </div>
+                <div class="right">
+                    <ons-toolbar-button onclick="cerrarSesion()">
+                        Cerrar Sesion
+                    </ons-toolbar-button>
                 </div>
             </ons-toolbar>
             <p style="text-align: center; margin-top: 10px;">

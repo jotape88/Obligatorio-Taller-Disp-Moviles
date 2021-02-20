@@ -287,6 +287,7 @@ function crearListadoProductos(dataProductos) {
             productos.push(prodX);
             //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
+
             let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
                     <ons-list-item tappable>
@@ -297,14 +298,14 @@ function crearListadoProductos(dataProductos) {
                     <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
                     </ons-list-item>
                 </ons-list>
-                <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='navegar(detalleProducto, false, unProducto)'>Ver producto</ons-button>
+                <ons-button style="margin-bottom: -14px;" modifier="quiet" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
                 </ons-card>`;
-            /*TODO: cuando agrego ${} a la funcion en el onclick, no carga los productos en el catalogo*/
+
+
             $("#divProductosCatalogo").append(unaCard);
 
         }
         $(".filaLista").click(btnProductoFavoritoHandler);
-
     }
 }
 
@@ -440,17 +441,37 @@ function obtenerProductoPorID(idProducto) {
     return producto;
 }
 
+function pasarAString(unJson) {
+
+    let palabraFinal = "";
+
+    for (let i = 0; i < unJson.length; i++) {
+
+        palabraFinal += unJson[i];
+    }
+    return palabraFinal;
+}
+
+
 function cargarDetalleProducto(despuesDeCargarElProducto) {
 
-    const miProducto = myNavigator.topPage.data;
-    alert(JSON.stringify(miProducto));
+    //const miProducto = JSON.stringify(myNavigator.topPage.data);
+    // const miProducto = myNavigator.topPage.data;
+    // console.log(miProducto);
+    // const jsonAstring = JSON.stringify(miProducto);
+    // console.log(jsonAstring);
+    // const idProd = pasarAString(jsonAstring);
+    // console.log(idProd);
 
-    const idProducto = miProducto._id;
+    /*En stock*/
+    let idProd = '601bf7cf3b11a01a78163122';
+    /*Sin stock */
+    //let idProd = '601bf7cf3b11a01a78163125';
 
-    if (idProducto) {
+    if (idProd) {
         $.ajax({
             type: 'GET',
-            url: urlBase + `/productos/${idProducto}`,
+            url: urlBase + `/productos/${idProd}`,
             /**
              * El beforeSend lo uso para cargar el token en el header de la petición y
              * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
@@ -494,11 +515,39 @@ function verDetalleProducto(dataProducto) {
         </ons-list>`
 
     if (miProducto.estado == "en stock") {
-        unaCard += `<ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick="">Comprar</ons-button>
-        </ons-card>`;
+        unaCard += `<div>
+        <ons-input id='inputProd_${miProducto._id}' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto(${miProducto._id})'>Comprar</ons-button>
+        </ons-card></div>`;
     }
     $("#divDetalleProductos").html(unaCard);
 }
+
+function comprarProducto(idProducto) {
+    const cantidad = $(`#inputProd_${idProducto}`).val();
+
+    if (cantidad) {
+        const datos = {
+            cantidadComprada: cantidad,
+            articuloComprado: idProducto
+        };
+        navegar('detalleDeCompra', false, datos);
+    } else {
+        const opciones = {
+            title: 'Error'
+        };
+        mensaje = 'Debe seleccionar la cantidad a comprar';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
+
+function cargarDetalleCompra() {
+    const datos = myNavigator.topPage.data;
+    const mensaje = `Ha comprado el producto ${datos.articuloComprado}. Cantidad comprada: ${datos.cantidadComprada}.`;
+    $("#pDetalleCompraMensaje").html(mensaje);
+}
+
+
 
 // function tdRecetaNombreHandler() {
 //     let recetaId = $(this).attr("recetaId");
