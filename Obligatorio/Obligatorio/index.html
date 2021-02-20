@@ -155,8 +155,8 @@
                         Cerrar Sesion
                     </ons-toolbar-button>
                 </div>
-
             </ons-toolbar>
+          
         </ons-page>
     </template>
 
@@ -186,6 +186,9 @@
                 </div>
                 <!--TODO: Al cambiar la pagina y volver al catalogo, no se muestran los productos-->
                 <div class="right">
+                    <ons-toolbar-button onclick="navegarAtras()">
+                        Atras
+                    </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
                         Cerrar Sesion
                     </ons-toolbar-button>
@@ -229,6 +232,9 @@
                     Detalle del producto
                 </div>
                 <div class="right">
+                    <ons-toolbar-button onclick="navegarAtras()">
+                        Atras
+                    </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
                         Cerrar Sesion
                     </ons-toolbar-button>
@@ -253,7 +259,7 @@
                     }
                 }, false);
             </script>
-             <ons-toolbar>
+            <ons-toolbar>
                 <div class="left">
                     <ons-toolbar-button onclick="abrirMenu()">
                         <ons-icon icon="md-menu"></ons-icon>
@@ -263,6 +269,9 @@
                     Detalle de compra
                 </div>
                 <div class="right">
+                    <ons-toolbar-button onclick="navegarAtras()">
+                        Atras
+                    </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
                         Cerrar Sesion
                     </ons-toolbar-button>
