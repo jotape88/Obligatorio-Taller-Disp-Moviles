@@ -464,9 +464,9 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
     // console.log(idProd);
 
     /*En stock*/
-    let idProd = '601bf7cf3b11a01a78163122';
+    //let idProd = '601bf7cf3b11a01a78163122';
     /*Sin stock */
-    //let idProd = '601bf7cf3b11a01a78163125';
+    let idProd = '601bf7cf3b11a01a78163125';
 
     if (idProd) {
         $.ajax({
