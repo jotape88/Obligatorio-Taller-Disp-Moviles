@@ -24,20 +24,7 @@ function navegarAtras() {
     cerrarMenu();
 }
 
-//TODO: Borrar esta funcion
-// Agrego evento a los botones del menú y de las pantallas.
-function agregarEventosEnBotones() {
-    // Menu
-    $("#btnMenuLogin").click(menuLoginHandler);
-    $("#btnMenuRegistro").click(menuRegistroHandler);
-    $("#btnMenuLogout").click(menuLogoutHandler);
-    // Registro
-    $("#btnRegistroRegistrarse").click(registroRegistrarseHandler);
-    // Login
-    $("#btnLoginIniciarSesion").click(loginIniciarSesionHandler);
-    // Detalle receta
-    $("#btnDetalleRecetaVolver").click(function () { mostrarHome(); });
-}
+
 
 // Oculto todo y muestro lo que corresponda.
 function inicializar() {
@@ -50,7 +37,7 @@ function inicializar() {
     chequearSesion(function () {
         // Muestro lo que corresponda en base a si hay o no usuario logueado.
         if (!usuarioLogueado) {
-            navegar('login', true);         
+            navegar('login', true);
             //mostrarMenuInvitado();
         } else {
             navegar('home', false);
@@ -261,7 +248,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
 }
 
 //TODO: Codigo repetido?
-function filtrarProductosXNombre(despuesDeCargarListadoProductos){
+function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
     $.ajax({
@@ -276,7 +263,7 @@ function filtrarProductosXNombre(despuesDeCargarListadoProductos){
          */
         data: {
             nombre: texto
-            },
+        },
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
@@ -292,15 +279,16 @@ function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
     //navegar('catalogo', false, dataProductos); - **llamando al catalogo entra en un loop infinito***
     // Vacío el array de productos.
-     productos.splice(0, productos.length);
-     if (dataProductos && dataProductos.data.length > 0) {
-        for(let i=0; i<dataProductos.data.length; i++){      
+    productos.splice(0, productos.length);
+    if (dataProductos && dataProductos.data.length > 0) {
+        for (let i = 0; i < dataProductos.data.length; i++) {
             let unProducto = dataProductos.data[i];
             //TODO: revisar, pusheamos todos los productos que recibimos de la api en la constante productos, para que podamos buscar un producto x id
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
             productos.push(prodX);
             //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
+
             let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
                     <ons-list-item tappable>
@@ -311,8 +299,12 @@ function crearListadoProductos(dataProductos) {
                     <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
                     </ons-list-item>
                 </ons-list>
+                <ons-button style="margin-bottom: -14px;" modifier="quiet" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
                 </ons-card>`;
+
+
             $("#divProductosCatalogo").append(unaCard);
+
         }
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
@@ -369,6 +361,7 @@ function eliminarFavoritos(){
         }
     }
 }
+
 
 
 // function catalogoProductosOnShow(){
@@ -706,6 +699,111 @@ function obtenerProductoPorID(idProducto) {
     return producto;
 }
 
+function pasarAString(unJson) {
+
+    let palabraFinal = "";
+
+    for (let i = 0; i < unJson.length; i++) {
+
+        palabraFinal += unJson[i];
+    }
+    return palabraFinal;
+}
+
+
+function cargarDetalleProducto(despuesDeCargarElProducto) {
+
+    //const miProducto = JSON.stringify(myNavigator.topPage.data);
+    // const miProducto = myNavigator.topPage.data;
+    // console.log(miProducto);
+    // const jsonAstring = JSON.stringify(miProducto);
+    // console.log(jsonAstring);
+    // const idProd = pasarAString(jsonAstring);
+    // console.log(idProd);
+
+    /*En stock*/
+    let idProd = '601bf7cf3b11a01a78163122';
+    /*Sin stock */
+    //let idProd = '601bf7cf3b11a01a78163125';
+
+    if (idProd) {
+        $.ajax({
+            type: 'GET',
+            url: urlBase + `/productos/${idProd}`,
+            /**
+             * El beforeSend lo uso para cargar el token en el header de la petición y
+             * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
+             * ejecutar antes de enviar la petición (beforeSend).
+             * Esto se debe hacer porque el header mediante el que se manda el token
+             * es un header personalizado (usualmente comienzan por x-).
+             */
+
+            beforeSend: cargarTokenEnRequest,
+            success: verDetalleProducto,
+            error: errorCallback,
+            complete: despuesDeCargarElProducto
+        });
+
+    } else {
+        const opciones = {
+            title: 'Error'
+        };
+        mensaje = 'Ocurrió un error al cargar el producto';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
+
+function verDetalleProducto(dataProducto) {
+
+    const miProducto = dataProducto.data;
+
+    const unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${miProducto.urlImagen}.jpg`;
+
+    let unaCard = `<ons-card><div class="title">${miProducto.nombre}</div>
+        <ons-list>
+            <ons-list-item tappable>
+            <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
+            <ons-list-item>Precio: $${miProducto.precio}</ons-list-item> 
+            <ons-list-item>Código: ${miProducto.codigo}</ons-list-item>
+            <ons-list-item>Etiquetas: ${miProducto.etiquetas}</ons-list-item>
+            <ons-list-item>Estado: ${miProducto.estado}</ons-list-item>
+            <ons-list-item>Descripcion: ${miProducto.descripcion}</ons-list-item>
+            <ons-list-item>Descripcion: ${miProducto.putaje}</ons-list-item>
+            </ons-list-item>
+        </ons-list>`
+
+    if (miProducto.estado == "en stock") {
+        unaCard += `<div>
+        <ons-input id='inputProd_${miProducto._id}' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto(${miProducto._id})'>Comprar</ons-button>
+        </ons-card></div>`;
+    }
+    $("#divDetalleProductos").html(unaCard);
+}
+
+function comprarProducto(idProducto) {
+    const cantidad = $(`#inputProd_${idProducto}`).val();
+
+    if (cantidad) {
+        const datos = {
+            cantidadComprada: cantidad,
+            articuloComprado: idProducto
+        };
+        navegar('detalleDeCompra', false, datos);
+    } else {
+        const opciones = {
+            title: 'Error'
+        };
+        mensaje = 'Debe seleccionar la cantidad a comprar';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
+
+function cargarDetalleCompra() {
+    const datos = myNavigator.topPage.data;
+    const mensaje = `Ha comprado el producto ${datos.articuloComprado}. Cantidad comprada: ${datos.cantidadComprada}.`;
+    $("#pDetalleCompraMensaje").html(mensaje);
+}
 
 
 
