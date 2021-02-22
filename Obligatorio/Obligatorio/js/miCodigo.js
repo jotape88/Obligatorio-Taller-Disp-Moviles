@@ -14,7 +14,7 @@ function navegar(paginaDestino, resetStack, datos) {
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
-        myNavigator.pushPage(`${paginaDestino}.html`, { data: datos });
+        myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
     }
     cerrarMenu();
 }
@@ -321,7 +321,7 @@ function crearListadoFavoritos(){
                 for (let j = 0; j < losFavoritos.length; j++){
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
-                    let unaCard = `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div><div>     <ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button> </div>
+                    let unaCard = `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
                     <ons-list>
                     <ons-list-item tappable>
                     <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
@@ -354,7 +354,6 @@ function eliminarFavoritos(){
                     if(unFavorito.elProducto._id == favoritoId){
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
-                        navegar('favoritos', false);
                     }
                 }
             }     
@@ -700,36 +699,32 @@ function obtenerProductoPorID(idProducto) {
 }
 
 function pasarAString(unJson) {
-
+    unJson = Object.values(unJson);
     let palabraFinal = "";
+    console.log(unJson);
 
     for (let i = 0; i < unJson.length; i++) {
-
-        palabraFinal += unJson[i];
+                 palabraFinal += unJson[i];       
     }
     return palabraFinal;
 }
 
 
 function cargarDetalleProducto(despuesDeCargarElProducto) {
-
-    //const miProducto = JSON.stringify(myNavigator.topPage.data);
-    // const miProducto = myNavigator.topPage.data;
-    // console.log(miProducto);
-    // const jsonAstring = JSON.stringify(miProducto);
-    // console.log(jsonAstring);
-    // const idProd = pasarAString(jsonAstring);
-    // console.log(idProd);
-
-    /*En stock*/
+    let idProd = myNavigator.topPage.data;
+    console.log(idProd);
+    idProd = pasarAString(idProd);
+    
+    //En stock
     //let idProd = '601bf7cf3b11a01a78163122';
     /*Sin stock */
-    let idProd = '601bf7cf3b11a01a78163125';
+    //let idProd = '601bf7cf3b11a01a78163125';
 
     if (idProd) {
         $.ajax({
             type: 'GET',
             url: urlBase + `/productos/${idProd}`,
+
             /**
              * El beforeSend lo uso para cargar el token en el header de la petición y
              * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
@@ -742,7 +737,8 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
             success: verDetalleProducto,
             error: errorCallback,
             complete: despuesDeCargarElProducto
-        });
+        }
+        );
 
     } else {
         const opciones = {
@@ -752,6 +748,12 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
         ons.notification.alert(mensaje, opciones);
     }
 }
+
+
+
+
+
+
 
 function verDetalleProducto(dataProducto) {
 

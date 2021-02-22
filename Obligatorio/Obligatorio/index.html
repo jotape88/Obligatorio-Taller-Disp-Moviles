@@ -26,17 +26,16 @@
         <ons-splitter-side id="menu" side="left" width="220px" collapse swipeable>
             <ons-page>
                 <ons-list>
-                    <ons-list-header id="menu-list-header">Usuario</ons-list-header>
-                    <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
-
-                    <ons-list-item onclick="navegar('catalogo', false)" tappable>Catalogo</ons-list-item> <!--Saque la funcion que llama al listado, y agregue un navegar directo a el template del catalogo-->
-                    <ons-list-item onclick="navegar('favoritos', false)" tappable>Favoritos</ons-list-item>
-                 
-                    <ons-list-item onclick="verProducto(3)" tappable>Pedidos</ons-list-item>
-
-                    <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
-                    <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>-->
-                </ons-list>
+                    <ons-list>
+                        <ons-list-header id="menu-list-header">Usuario</ons-list-header>
+                        <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
+                        <ons-list-item onclick="navegar('catalogo', false)" tappable>Catalogo</ons-list-item> <!--Saque la funcion que llama al listado, y agregue un navegar directo a el template del catalogo-->
+                        <ons-list-item onclick="navegar('favoritos', false)" tappable>Favoritos</ons-list-item>
+                        <ons-list-item onclick="verProducto(3)" tappable>Pedidos</ons-list-item>
+    
+                        <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
+                        <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>-->
+                    </ons-list>
             </ons-page>
         </ons-splitter-side>
         <!-- El spliiter content contiene la pagina a mostrar. -->
