@@ -11,6 +11,7 @@ function todoCargado() {
 }
 
 function navegar(paginaDestino, resetStack, datos) {
+
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
@@ -124,9 +125,9 @@ function chequearSesion(despuesDeChequearSesion) {
              */
             beforeSend: cargarTokenEnRequest,
             // Volvemos a utilizar una función anónima.
-            success: function(response){
-                 usuarioLogueado = new Usuario(response.data._id, response.data.nombre, response.data.apellido, response.data.email, response.data.direccion, null);
-            },           
+            success: function (response) {
+                usuarioLogueado = new Usuario(response.data._id, response.data.nombre, response.data.apellido, response.data.email, response.data.direccion, null);
+            },
             error: errorCallback,
             complete: despuesDeChequearSesion
         });
@@ -271,9 +272,7 @@ function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
     });
 }
 
-
-
-//TODO: BORRAR METODO ?
+//TODO: hacer filtro de productos por etiquetas.
 
 function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
@@ -288,7 +287,7 @@ function crearListadoProductos(dataProductos) {
             productos.push(prodX);
             //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
-
+            console.log(unProducto._id)
             let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
                     <ons-list-item tappable>
@@ -310,15 +309,16 @@ function crearListadoProductos(dataProductos) {
     }
 }
 
-function crearListadoFavoritos(){
+function crearListadoFavoritos() {
+    $("#divFavoritos").html("");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
-    if(usuariosFavsJSON && usuariosFavsJSON.length > 0){
-        for(let i = 0; i < usuariosFavsJSON.length; i++){
+    if (usuariosFavsJSON && usuariosFavsJSON.length > 0) {
+        for (let i = 0; i < usuariosFavsJSON.length; i++) {
             let unFavJson = usuariosFavsJSON[i];
-            if(unFavJson.usuario === usuarioLogueado.email) {
+            if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
-                for (let j = 0; j < losFavoritos.length; j++){
+                for (let j = 0; j < losFavoritos.length; j++) {
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
                     let unaCard = `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
@@ -332,119 +332,36 @@ function crearListadoFavoritos(){
                     </ons-list-item>
                 </ons-list>
                 </ons-card>`;
-                $("#divFavoritos").append(unaCard);
-                }              
+                    $("#divFavoritos").append(unaCard);
+                }
             }
         }
         $(".filaFavs").click(eliminarFavoritos);
     }
 }
 
-function eliminarFavoritos(){
+function eliminarFavoritos() {
     let favoritoId = $(this).attr("myAttr2");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
-    if(usuariosFavsJSON && usuariosFavsJSON.length > 0){
-        for(let i = 0; i < usuariosFavsJSON.length; i++){
+    if (usuariosFavsJSON && usuariosFavsJSON.length > 0) {
+        for (let i = 0; i < usuariosFavsJSON.length; i++) {
             let unFavJson = usuariosFavsJSON[i];
-            if(unFavJson.usuario === usuarioLogueado.email) {
+            if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
-                for (let j = 0; j < losFavoritos.length; j++){
+                for (let j = 0; j < losFavoritos.length; j++) {
                     let unFavorito = losFavoritos[j];
-                    if(unFavorito.elProducto._id == favoritoId){
+                    if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
                     }
                 }
-            }     
+            }
         }
     }
+    crearListadoFavoritos();
 }
 
-
-
-// function catalogoProductosOnShow(){
-//     console.log("catalogo onShow")
-//     cargarListadoProductos();
-// }
-
-// function cargarListadoProductos(){
-
-// }
-
-// function cargarDetalleCatalogo(){
-//     const datos = myNavigator.topPage.data;
-//     console.log(datos);
-//     //const mensaje = `Se mostro ${datos.Usuario}`;
-
-// }
-
-// function detalleCompraOnShow(){
-//     alert("este es el onshow")
-// }
-
-// function crearListadoProductos(dataProductos) {
-//     navegar('catalogo', false);
-//     // Vacío el array de recetas.
-//     productos.splice(0, productos.length);
-//     if (dataProductos && dataProductos.length > 0) {
-//         // Si hay recetas completo y muestro la tabla.
-//         let filas = ``;
-//         for (let i = 0; i < dataProductos.length; i++) {
-//             let unProducto = dataProductos[i];
-//             //let usuarioRecetaObjeto = new Usuario(unaReceta.usuario._id, unaReceta.usuario.nombre, unaReceta.usuario.apellido, unaReceta.usuario.email, unaReceta.usuario.direccion, null);
-//             let unProductoObjeto = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
-//             // Agrego la receta a mi array de recetas.
-//             productos.push(unProductoObjeto);
-//             filas += `
-//                 <tr>
-//                     <td><img onError="imgError(this);" src="${unProductoObjeto.urlImagen}" width="50"></td>
-//                     <td class="tdRecetaNombre" productoId="${unProductoObjeto._id}">${unProductoObjeto.nombre}</td>
-//                     <td><input class="btnRecetaFavorito" productoId="${unProductoObjeto._id}" type="button" value="${obtenerNombreBotonFavorito(unaRecetaObjeto)}"></td>
-//                 </tr>
-//             `;
-//         }
-//         // TODO: Estaría bueno revisar los favoritos para ver si hay en favoritos alguna receta que ya no esté en la base de datos para borrarla.
-//         $("#tablaTbodyHomeRecetas").html(filas);
-//         $("#tablaHomeRecetas").show();
-//         $(".btnRecetaFavorito").click(btnRecetaFavoritoHandler);
-//         $(".tdRecetaNombre").click(tdRecetaNombreHandler);
-//     } else {
-//         // Si no hay recetas, aviso que no hay recetas.
-//         $("#pHomeMensajes").html("No se encontraron recetas.");
-//     }
-// }
-
-
-/**
- * Función que se encarga de sustituir el src de las imágenes por la de placeholder en caso de tener un src inválido.
- * Se ejecuta desde el evento onError de las etiquetas img.
- */
-
-// function imgError(img) {
-//     $(img).attr("src", "./img/recetas/placeholder.png");
-// }
-
-// Función que revisa si la receta está o no en favoritos para ver qué texto ponerle al botón.
-// function obtenerNombreBotonFavorito(receta) {
-//     let nombreBoton = "Agregar";
-//     let favoritosLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
-//     let favoritosJSON = null;
-//     if (favoritosLocalStorage) {
-//         favoritosJSON = JSON.parse(favoritosLocalStorage);
-//         let i = 0;
-//         let encontrada = false;
-//         while (!encontrada && i < favoritosJSON.length) {
-//             let unFavorito = favoritosJSON[i];
-//             if (unFavorito._id === receta._id) {
-//                 encontrada = true;
-//                 nombreBoton = "Sacar";
-//             }
-//             i++;
-//         }
-//     }
-//     return nombreBoton;
-// }
 
 //TODO: funcion que revisa si la receta está guardada local storage o no, y agrega o elimina segun corresponda REVISAR
 function btnProductoFavoritoHandler() {
@@ -452,45 +369,45 @@ function btnProductoFavoritoHandler() {
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
     let elProducto = obtenerProductoPorID(productoId);
-    if (usuariosFavsJSON !== null){
+    if (usuariosFavsJSON !== null) {
         let i = 0;
         let bandera = false;
         while (!bandera && i < usuariosFavsJSON.length) {
             let unUsuFavJSON = usuariosFavsJSON[i];
             let unMailUsuario = unUsuFavJSON.usuario;
             let favoritosUsuario = unUsuFavJSON.favoritos;
-            if (usuarioLogueado.email === unMailUsuario){
+            if (usuarioLogueado.email === unMailUsuario) {
                 if (!bandera) {
-                    for(let k = 0; k < favoritosUsuario.length; k++) {
+                    for (let k = 0; k < favoritosUsuario.length; k++) {
                         let unFavorito = favoritosUsuario[k];
                         if (productoId === unFavorito.elProducto._id) {
                             favoritosUsuario.splice(k, 1);
                             bandera = true;
-                        }    
-                    } 
+                        }
+                    }
                 }
                 if (!bandera) {
-                    favoritosUsuario.push({elProducto});
+                    favoritosUsuario.push({ elProducto });
                     bandera = true;
-                }              
+                }
             } else {
-                    if(!existeUsuario(usuarioLogueado.email)){
-                        usuariosFavsJSON.push({usuario: usuarioLogueado.email, favoritos: [{elProducto}]});
-                        bandera = true;
-                    }
+                if (!existeUsuario(usuarioLogueado.email)) {
+                    usuariosFavsJSON.push({ usuario: usuarioLogueado.email, favoritos: [{ elProducto }] });
+                    bandera = true;
+                }
             }
             i++;
         }
     } else {
         if (elProducto) {
-            usuariosFavsJSON = [{usuario: usuarioLogueado.email, favoritos: [{elProducto}]}];
+            usuariosFavsJSON = [{ usuario: usuarioLogueado.email, favoritos: [{ elProducto }] }];
         }
-    }  
+    }
     window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
 }
 
 
-function existeUsuario(pEmail){
+function existeUsuario(pEmail) {
     let existe = false;
     let i = 0;
     let favoritos = window.localStorage.getItem("AppProductosFavoritos");
@@ -499,190 +416,14 @@ function existeUsuario(pEmail){
         while (!existe && i < favoritosJSON.length) {
             let unFav = favoritosJSON[i];
             let unEmail = unFav.usuario;
-            if(pEmail == unEmail){
+            if (pEmail == unEmail) {
                 existe = true;
-            }  
-            i++;    
+            }
+            i++;
         }
     }
     return existe;
 }
-
-        //////
-
-        // else {
-        //     usuariosFavsJSON.push({usuario: usuarioLogueado.email, favoritos: [{elProducto}]});
-        //     bandera = true;
-        // }   
-
-        ///////
-                     //Chequeamos que el local storage no este vacio ???
-                    //if (usuariosFavsLocalStorage !== null) {
-                    //Parseamos y convertimos a objetos el local storage favoritos ???
-                    // usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
-                    // let j = 0;
-                    // let encontrado2 = false;
-                    // //Recorremos el objeto recien parseado de lo recibido del local storage ???
-                    // while (!encontrado2 && j < usuariosFavsJSON.length) {
-                    //     let unUsuFavJSON = usuariosFavsJSON[j];
-                    //     //Comparamos el mail del usuario logueado con el mail que existe en un usuario del json recien parseado ???
-                    //     if(usuarioLogueado.email === unUsuFavJSON.usuario){
-                    //         //Recorremos todos los favoritos objeto JSON recien parseado que vino del local storage ???
-
-                    //     }
-                    //     j++;
-                    // }
-                    //Si el producto que vino desde el html no coincide con uno existente en el JSON,
-                    // if (!encontrado1) {
-                    //     //Verificamos que hayamos recibido un producto desde el html
-                    //     if (elProducto) {
-                    //         let l = 0;
-                    //         let encontrado3 = false;
-                    //         //recorremos el array de usuarios parseados JSON
-                    //         while (!encontrado3 && l < usuariosFavsJSON.length) {
-                    //             let unUsuFavJSON = usuariosFavsJSON[l];
-                    //             let unMailusuario = unUsuFavJSON.usuario;
-                    //             let favoritosUsuario = unUsuFavJSON.favoritos;
-                    //             //Revisamos si el mail del usuario logueado coincide con algun mail de los registrados en el array de favoritos
-                    //             if(usuarioLogueado.email == unMailusuario){
-                    //                 //En caso afirmativo, pusheamos en el array de favoritos de ese usuario, el producto (favorito) que recibimos del html
-                    //                 encontrado3 = true;
-                    //                 encontrado1 = true;
-                    //             }
-                    //             l++;
-                    //         }              
-                    //     }
-                    // }
-                    //si el local storage esta vacio, pusheamos un nuevo objeto usuario con el favorito al que acaba de seleccionar.
-    //            } 
-
-    /////////IMPORTANTEIMPORTANTE
-
-    
-    
-    ////////////////////////////////////////
-    
-
-    //             //Si el mail del usuario logueado no existe dentro de los favoritos del JSON:
-    //         } else {  
-    //                 // parseamos por 80 vez el local storage ???
-    //                 usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
-    //                 let m = 0;
-    //                 let encontrado2 = false;
-    //                 //Recorremos los favoritos recien parseados
-    //                 while (!encontrado2 && m < usuariosFavsJSON.length) {
-    //                     let unUsuFavJSON = usuariosFavsJSON[m];
-    //                     //chequeamos que el mail del usuario logueado sea el mismo que el del usuariosFavsJSON
-    //                     if(usuarioLogueado.email === unUsuFavJSON.usuario){
-    //                         let favoritosUsuario = unUsuFavJSON.favoritos;
-    //                         //recorremos los favoritos del usuario
-    //                         for(let n = 0; n < favoritosUsuario.length; n++){
-    //                             let unId = favoritosUsuario[n];
-    //                             //si  el elProducto que nos manda el html existe en los favoritos quiere decir que ya fue seleccionado, y entonces lo deseleccionamos
-    //                             if (productoId === unId.elProducto._id) {
-    //                                 favoritosUsuario.splice(n, 1);
-    //                                 encontrado2 = true;
-    //                                 encontrado1 = true;
-    //                             }
-    //                         }
-    //                     }
-    //                     m++;
-    //                 }
-    //                 if (!encontrado2) {
-    //                     if (elProducto) {
-    //                         let o = 0;
-    //                         let encontrado3 = false;
-    //                         while (!encontrado3 && o < usuariosFavsJSON.length) {
-    //                             let unUsuFavJSON = usuariosFavsJSON[o];
-    //                             let unMailUsuario = unUsuFavJSON.usuario;
-    //                             let favoritosUsuario = unUsuFavJSON.favoritos;
-    //                             if(usuarioLogueado.email == unMailUsuario){
-    //                                 favoritosUsuario.push({elProducto});
-    //                                 encontrado3 = true;
-    //                                 encontrado2 = true;
-    //                                 encontrado1 = true;
-    //                             }
-    //                             o++;
-    //                         }              
-    //                     }
-    //                 }
-    //                 if (!encontrado2) {
-    //                     if (elProducto) {
-    //                         usuariosFavsJSON.push({usuario: usuarioLogueado.email, favoritos: [{elProducto}]});
-    //                         encontrado2 = true;
-    //                         encontrado1 = true;
-    //                     }
-    //                 }
-    //         }
-    //         i++;
-    //     }
-
-
-
-
-
-
-            //////FUNCION SATANICA
-            
-// function btnProductoFavoritoHandler() {
-//     let productoId = $(this).attr("myAttr");
-//     let favoritosLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
-//     //favs = null;
-//     let producto = obtenerProductoPorID(productoId);
-//     if (favoritosLocalStorage !== null && existeUsuario(usuarioLogueado.email)) {
-//         favs = JSON.parse(favoritosLocalStorage);
-//         let i = 0;
-//         let encontrada = false;
-//         while (!encontrada && i < favs.length) {
-//             let unFav = favs[i];
-//             if(usuarioLogueado.email === unFav.usuario){
-//                 let unusu = unFav.favoritos;
-//                 for(let j = 0; j < unusu.length; j++){
-//                     let unId = unusu[j];
-//                     if (productoId === unId.producto._id) {
-//                         unusu.splice(j, 1);
-//                         encontrada = true;
-//                     }
-//                 }
-//             }
-//             i++;
-//         }
-//         if (!encontrada) {
-//             if (producto) {
-//                 //favoritosJSON.push([{usuario: usuarioLogueado, favoritos:[{producto}]}]);
-//                 let ite = 0;
-//                 let encontrado = false;
-//                 while (!encontrado && ite < favs.length) {
-//                     let unFav = favs[ite];
-//                     let unaPija = unFav[ite].usuario;
-//                     let unaConcha = unFav[ite].favoritos;
-//                     if(usuarioLogueado.email == unaPija){
-//                         unaConcha.push({producto});
-//                         encontrado = true;
-//                     }
-//                     ite++;
-//                 }              
-//             }
-//         }
-//     } else {
-//         if (producto) {
-//             //favoritosJSON = [{usuario: usuarioLogueado, favoritos:[{producto}]}];
-//             if (!existeUsuario(usuarioLogueado.email)){
-//                 favs.push([{usuario: usuarioLogueado.email, favoritos: [{producto}]}]);
-//             } else {
-//                 favs = [{usuario: usuarioLogueado.email, favoritos: [{producto}]}];
-//             }
-//         }
-//     }
-//     window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(favs));
-//     //navegar('home', false);
-//     console.log(favs);
-// }
-
-
-
-
-
 
 //Obtengo el objeto producto a traves del Id
 function obtenerProductoPorID(idProducto) {
@@ -704,7 +445,7 @@ function pasarAString(unJson) {
     console.log(unJson);
 
     for (let i = 0; i < unJson.length; i++) {
-                 palabraFinal += unJson[i];       
+        palabraFinal += unJson[i];
     }
     return palabraFinal;
 }
@@ -712,9 +453,8 @@ function pasarAString(unJson) {
 
 function cargarDetalleProducto(despuesDeCargarElProducto) {
     let idProd = myNavigator.topPage.data;
-    console.log(idProd);
     idProd = pasarAString(idProd);
-    
+
     //En stock
     //let idProd = '601bf7cf3b11a01a78163122';
     /*Sin stock */
@@ -749,12 +489,6 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
     }
 }
 
-
-
-
-
-
-
 function verDetalleProducto(dataProducto) {
 
     const miProducto = dataProducto.data;
@@ -777,7 +511,7 @@ function verDetalleProducto(dataProducto) {
     if (miProducto.estado == "en stock") {
         unaCard += `<div>
         <ons-input id='inputProd_${miProducto._id}' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto(${miProducto._id})'>Comprar</ons-button>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto("${miProducto._id}")'>Comprar</ons-button>
         </ons-card></div>`;
     }
     $("#divDetalleProductos").html(unaCard);
@@ -808,56 +542,6 @@ function cargarDetalleCompra() {
 }
 
 
-
-// function tdRecetaNombreHandler() {
-//     let recetaId = $(this).attr("recetaId");
-//     mostrarDetalleReceta(recetaId);
-// }
-
-/* Detalle de receta */
-// function cargarDetalleReceta(recetaId, despuesDeCargarDetalleReceta) {
-//     if (recetaId) {
-//         $.ajax({
-//             type: 'GET',
-//             url: urlBase + `recetas/${recetaId}`,
-//             /**
-//              * El beforeSend lo uso para cargar el token en el header de la petición y
-//              * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
-//              * ejecutar antes de enviar la petición (beforeSend).
-//              * Esto se debe hacer porque el header mediante el que se manda el token
-//              * es un header personalizado (usualmente comienzan por x-).
-//              */
-//             beforeSend: cargarTokenEnRequest,
-//             success: actualizarDetalleReceta,
-//             error: errorCallback,
-//             complete: despuesDeCargarDetalleReceta
-//         });
-//     } else {
-//         $("#pDetalleRecetaMensajes").html("Ha ocurrido un error al cargar los datos de la receta.");
-//         despuesDeCargarDetalleReceta();
-//     }
-// }
-
-// function actualizarDetalleReceta(dataReceta) {
-//     // Podría utilizar directamente los datos que me llegan, pero ya que tengo las clases, creo instancias para trabajar con ellas.
-//     let usuarioRecetaObjeto = new Usuario(dataReceta.usuario._id, dataReceta.usuario.nombre, dataReceta.usuario.apellido, dataReceta.usuario.email, dataReceta.usuario.direccion, null);
-//     let recetaObjeto = new Receta(dataReceta._id, dataReceta.fecha, dataReceta.nombre, dataReceta.ingredientes, dataReceta.preparacion, dataReceta.urlImagen, usuarioRecetaObjeto);
-//     $("#h2DetaleRecetaNombre").html(recetaObjeto.nombre);
-//     $("#imgDetalleRecetaImagen").attr("src", recetaObjeto.urlImagen);
-//     let listaIngredientes = ``;
-//     for (let i = 0; i < recetaObjeto.ingredientes.length; i++) {
-//         let unIngrediente = recetaObjeto.ingredientes[i];
-//         listaIngredientes += `<tr><td>${unIngrediente}</td></tr>`;
-//     }
-//     $("#tablaTbodyDetalleReceta").html(listaIngredientes);
-//     $("#pDetalleRecetaPreparacion").html(recetaObjeto.preparacion);
-//     $("#divDetalleRecetaOtrosDatos").html(`
-//         <p><b>Usuario:</b> ${recetaObjeto.usuario.nombre}</p>
-//         <p><b>Fecha:</b> ${new Date(recetaObjeto.fecha)}</p>
-//     `);
-//     $("#divDetalleRecetaContenido").show();
-// }
-
 /* Generales */
 function errorCallback(error) {
     alert("Ha ocurrido un error. Por favor, intente nuevamente.");
@@ -869,3 +553,4 @@ function cerrarMenu() {
     // No puedo seleccionar el elemento con $("#menu") porque la función .close() no es de jQuery.
     document.querySelector("#menu").close();
 }
+
