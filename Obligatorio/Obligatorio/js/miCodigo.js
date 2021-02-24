@@ -7,7 +7,7 @@ ons.ready(todoCargado);
 
 function todoCargado() {
     yNavigator = document.querySelector('#myNavigator');
-    inicializar(); //TODO: descomente esta funcion para acceder al token guardado y logear automaticamente al usuario en caso de que el token este guardado en el localstorage
+    inicializar();
 }
 
 function navegar(paginaDestino, resetStack, datos) {
@@ -26,12 +26,7 @@ function navegarAtras() {
 }
 
 
-
-// Oculto todo y muestro lo que corresponda.
 function inicializar() {
-    // Oculto todo.
-    //ocultarSecciones();
-    //ocultarOpcionesMenu();
     // Chequeo si en el localStorage hay token guardado.
     tokenGuardado = window.localStorage.getItem("AppUsuarioToken");
     // Al chequeo de la sesión, le paso como parámetro una función anónima que dice qué hacer después.
@@ -97,15 +92,6 @@ function abrirMenu() {
 
 
 
-// function mostrarDetalleReceta(recetaId) {
-//     ocultarSecciones();
-//     vaciarTodosLosCampos();
-//     // Le paso 2 parámetros, el id de la receta que quiero mostrar y una función de callback
-//     cargarDetalleReceta(recetaId, function () {
-//         $("#divDetalleReceta").show();
-//     });
-// }
-
 /* Sesión */
 function chequearSesion(despuesDeChequearSesion) {
     // Asumo que no hay usuario logueado y en caso de que si, lo actualizo.
@@ -156,67 +142,146 @@ function cerrarSesion() {
 
 /* Registro */
 function registroRegistrarseHandler() {
-    $("#pRegistroMensajes").html("");
-
     let nombreIngresado = $("#txtRegistroNombre").val();
     let apellidoIngresado = $("#txtRegistroApellido").val();
     let direccionIngresada = $("#txtRegistroDireccion").val();
     let emailIngresado = $("#txtRegistroEmail").val();
     let passwordIngresado = $("#txtRegistroPassword").val();
+    let passwordIngresado2 = $("#txtRegistroRepPassword").val();
+    const opciones = {title: 'Error'};
+    if (validarCorreo(emailIngresado)) {
+        if (passwordIngresado === passwordIngresado2){
+            if (validarPassword(passwordIngresado)) {
+                if(validarNombre(nombreIngresado)){
+                    if(validarApellido(apellidoIngresado)){
+                        if(validarDireccion(direccionIngresada)){
+                            const datosUsuario = {
+                                nombre: nombreIngresado,
+                                apellido: apellidoIngresado,
+                                email: emailIngresado,
+                                direccion: direccionIngresada,
+                                password: passwordIngresado
+                            };
+    
+                            $.ajax({
+                                type: 'POST',
+                                url: urlBase + 'usuarios',
+                                contentType: "application/json",
+                                data: JSON.stringify(datosUsuario),
+                                // Lo que se debe hacer es tan poco, que lo dejo en una función anónima.
+                                success: function () {
+                                    alert("El usuario ha sido creado correctamente");
+                                    navegar('login', true);
+                                },
+                                error: errorCallback
+                            });
+                        } else {
+                            mensaje = 'La dirección debe contener un nombre de calle y un numero de puerta';
+                            ons.notification.alert(mensaje, opciones);
+                        }           
+                    } else{
+                        mensaje = 'El apellido no puede estar vacío o contener un solo caracter';
+                        ons.notification.alert(mensaje, opciones);
+                    }
+                } else {
+                    mensaje = 'El nombre no puede estar vacío o contener un solo caracter';
+                    ons.notification.alert(mensaje, opciones);
+                }
+            } else {
+                mensaje = 'La contraseña debe tener al menos 8 caracteres';
+                ons.notification.alert(mensaje, opciones);
+            }
+        } else {
+            mensaje = 'Los passwords no coinciden';
+            ons.notification.alert(mensaje, opciones);
+        }     
+    } else {
+        mensaje = 'El formato del correo no es válido';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
 
-    // TODO: Faltan validaciones:
-    // Agregar un segundo campo de password para la verificación del mismo.
-    // Todos los campos son obligatorios.
-    // El password debe tener como mínimo 8 caracteres.
-    // El correo debe tener un formato válido.
-    // El correo debe ser único en el sistema (no se puede validar). 
+function validarCorreo(pCorreo){
+    let esValido = false;
+    if(pCorreo.trim().length >= 6) {
+        let i = 0;
+        while (!esValido && i < pCorreo.length){
+            let unCaracter = pCorreo.charAt(i);
+                if (unCaracter === "@"){
+                    let j = i;
+                    while (!esValido && j < pCorreo.length){
+                        let unCaracter2 = pCorreo.charAt(j+1);
+                        if(unCaracter2 == "."){
+                            esValido = true;
+                        }
+                        j++;
+                    }
+                }
+            i++;
+        }
+    }
+    return esValido;
+}
 
-    const datosUsuario = {
-        nombre: nombreIngresado,
-        apellido: apellidoIngresado,
-        email: emailIngresado,
-        direccion: direccionIngresada,
-        password: passwordIngresado
-    };
+function validarPassword(pPassword){
+    return pPassword.trim().length >= 8;
+}
 
-    $.ajax({
-        type: 'POST',
-        url: urlBase + 'usuarios',
-        contentType: "application/json",
-        data: JSON.stringify(datosUsuario),
-        // Lo que se debe hacer es tan poco, que lo dejo en una función anónima.
-        success: function () {
-            alert("El usuario ha sido creado correctamente");
-            navegar('login', true);
-        },
-        error: errorCallback
-    });
+function validarNombre(pNombre){
+    return pNombre.trim().length >= 1;
+}
+
+function validarApellido(pApellido){
+    return pApellido.trim().length >= 1;
+}
+
+function validarDireccion(pDireccion){
+    let esValido = false;
+    if (pDireccion.trim().length >= 1){        
+        let tieneLetras = false;
+        let tieneNumeros = false;
+        let i = 0;
+        while (!esValido && i < pDireccion.length) {
+            let unCaracter = pDireccion.charAt(i);
+            if(isNaN(unCaracter)) tieneLetras = true;
+            if((parseInt(unCaracter))){
+                tieneNumeros = true;
+            } 
+            if(tieneLetras && tieneNumeros) esValido = true;
+            i++;
+        } 
+    }
+    return esValido;
 }
 
 /* Login */
 function loginIniciarSesionHandler() {
-    $("#pLoginMensajes").html("");
-
     let emailIngresado = $("#txtLoginEmail").val();
     let passwordIngresado = $("#txtLoginPassword").val();
-
-    // TODO: Faltan validaciones:
-    // Todos los campos son obligatorios.
-    // El password debe tener como mínimo 8 caracteres.
-    // El correo debe tener un formato válido.
-    const datosUsuario = {
-        email: emailIngresado,
-        password: passwordIngresado
-    };
-
-    $.ajax({
-        type: 'POST',
-        url: urlBase + 'usuarios/session',
-        contentType: "application/json",
-        data: JSON.stringify(datosUsuario),
-        success: iniciarSesion,
-        error: errorCallback
-    });
+    const opciones = {title: 'Error'};
+    if (validarCorreo(emailIngresado)) {
+        if(validarPassword(passwordIngresado)){
+            const datosUsuario = {
+                email: emailIngresado,
+                password: passwordIngresado
+            };
+        
+            $.ajax({
+                type: 'POST',
+                url: urlBase + 'usuarios/session',
+                contentType: "application/json",
+                data: JSON.stringify(datosUsuario),
+                success: iniciarSesion,
+                error: errorCallback
+            });
+        } else {
+            mensaje = 'La contraseña debe tener al menos 8 caracteres';
+            ons.notification.alert(mensaje, opciones);
+        }
+    } else {
+        mensaje = 'El formato del correo no es válido';
+        ons.notification.alert(mensaje, opciones);
+    }
 }
 
 function iniciarSesion(dataUsuario) {
@@ -282,12 +347,10 @@ function crearListadoProductos(dataProductos) {
     if (dataProductos && dataProductos.data.length > 0) {
         for (let i = 0; i < dataProductos.data.length; i++) {
             let unProducto = dataProductos.data[i];
-            //TODO: revisar, pusheamos todos los productos que recibimos de la api en la constante productos, para que podamos buscar un producto x id
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
             productos.push(prodX);
             //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
-            console.log(unProducto._id)
             let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
                     <ons-list-item tappable>
@@ -363,7 +426,6 @@ function eliminarFavoritos() {
 }
 
 
-//TODO: funcion que revisa si la receta está guardada local storage o no, y agrega o elimina segun corresponda REVISAR
 function btnProductoFavoritoHandler() {
     let productoId = $(this).attr("myAttr");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
@@ -442,8 +504,6 @@ function obtenerProductoPorID(idProducto) {
 function pasarAString(unJson) {
     unJson = Object.values(unJson);
     let palabraFinal = "";
-    console.log(unJson);
-
     for (let i = 0; i < unJson.length; i++) {
         palabraFinal += unJson[i];
     }
@@ -454,11 +514,6 @@ function pasarAString(unJson) {
 function cargarDetalleProducto(despuesDeCargarElProducto) {
     let idProd = myNavigator.topPage.data;
     idProd = pasarAString(idProd);
-
-    //En stock
-    //let idProd = '601bf7cf3b11a01a78163122';
-    /*Sin stock */
-    //let idProd = '601bf7cf3b11a01a78163125';
 
     if (idProd) {
         $.ajax({
@@ -506,7 +561,7 @@ function verDetalleProducto(dataProducto) {
             <ons-list-item>Descripcion: ${miProducto.descripcion}</ons-list-item>
             <ons-list-item>Descripcion: ${miProducto.putaje}</ons-list-item>
             </ons-list-item>
-        </ons-list>`
+        </ons-list>`;
 
     if (miProducto.estado == "en stock") {
         unaCard += `<div>
