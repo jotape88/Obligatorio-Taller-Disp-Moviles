@@ -371,7 +371,7 @@ function crearListadoProductos(dataProductos) {
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
 }
-
+//holas
 function crearListadoFavoritos() {
     $("#divFavoritos").html("");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
@@ -382,6 +382,8 @@ function crearListadoFavoritos() {
             if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
                 for (let j = 0; j < losFavoritos.length; j++) {
+                    //TODO: Cambiar codigo para que busque el prod cada vez que carga el listado de Favoritos
+                    // y hacer validacion por si el id no existe. (ver de mostrar imagen o cartel que indique que el producto no existe)
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
                     let unaCard = `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
@@ -504,6 +506,7 @@ function obtenerProductoPorID(idProducto) {
 function pasarAString(unJson) {
     unJson = Object.values(unJson);
     let palabraFinal = "";
+
     for (let i = 0; i < unJson.length; i++) {
         palabraFinal += unJson[i];
     }
@@ -565,20 +568,24 @@ function verDetalleProducto(dataProducto) {
 
     if (miProducto.estado == "en stock") {
         unaCard += `<div>
-        <ons-input id='inputProd_${miProducto._id}' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
+        <ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
         <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto("${miProducto._id}")'>Comprar</ons-button>
         </ons-card></div>`;
     }
     $("#divDetalleProductos").html(unaCard);
 }
 
-function comprarProducto(idProducto) {
-    const cantidad = $(`#inputProd_${idProducto}`).val();
+function comprarProducto(idProd) {
+
+    //Capturo la cantidad comprada desde el input
+    const cantidad = $(`#inputProd`).val();
+
+    const miProd = obtenerProductoPorID(idProd);
 
     if (cantidad) {
         const datos = {
             cantidadComprada: cantidad,
-            articuloComprado: idProducto
+            productoComprado: miProd
         };
         navegar('detalleDeCompra', false, datos);
     } else {
@@ -592,10 +599,66 @@ function comprarProducto(idProducto) {
 
 function cargarDetalleCompra() {
     const datos = myNavigator.topPage.data;
-    const mensaje = `Ha comprado el producto ${datos.articuloComprado}. Cantidad comprada: ${datos.cantidadComprada}.`;
+
+    const idProd = datos.productoComprado._id;
+    const subTotal = datos.cantidadComprada * datos.productoComprado.precio;
+    const mensaje = `Producto <strong>${datos.productoComprado.nombre}</strong>.
+    <br> Cantidad comprada: <strong>${datos.cantidadComprada}</strong>.<br>
+    Sub Total: <strong> $${subTotal}</strong>`;
     $("#pDetalleCompraMensaje").html(mensaje);
+
+    agregarAlCarrito(idProd, cantidad)
+
+
 }
 
+
+function agregarAlCarrito(idProd, cantidad) {
+    //Ver si hay algun carrito en el localStorage
+    let comprasEnElCarritoLocalStorage = window.localStorage.getItem("carritoDeCompras");
+
+    //Pasarlo a JSON para poder usarlo y trabajar
+    let comprasEnElCarritoJSON = JSON.parse(comprasEnElCarritoLocalStorage);
+
+    //Este es el producto que se quiere agregar al carrito
+    const miProducto = obtenerProductoPorID(idProd);
+
+    // Creo el objeto a guardar en el local Storage
+    let ProdEnElCarrito = {
+        usuario: usuarioLogueado,
+        productoComprado: miProducto,  
+        cantidadComprada: cantidad
+    }
+
+    //Si el localStorage no está vacío, chequeo que productos tiene.
+    if (comprasEnElCarritoJSON !== null) {
+        let i = 0;
+        let bandera = false;
+        
+        while (!bandera && i < comprasEnElCarritoJSON.length) {
+            let unaCompra = comprasEnElCarritoJSON[i];
+            let productoComprado = unaCompra.productoComprado;
+            let unMailUsuario = unaCompra.usuario;
+            let idProdComprado = productoComprado._id;
+            if (idProdComprado == idProd && elCarritoEsDelUsuario) {
+                //si el producto comprado ya existe, hay que modificar en el localStorage la cantidad comprada
+                ProdEnElCarrito.cantidadComprada += cantidad; 
+            } else {
+                //Si no existe lo agrego al localStorage
+                
+            }
+        }
+
+    } else {
+        //Si el localStorage estaba vacío, agrego el producto sin verfiicar
+        comprasEnElCarritoJSON.push({usuario: usuarioLogueado.email, compra: [{ProdEnElCarrito}] });
+    }
+    window.localStorage.setItem("carritoDeCompras", JSON.stringify(comprasEnElCarritoJSON));
+}
+
+function elCarritoEsDelUsuario(){
+    // TODO: verificar si el carrito es del usuario
+}
 
 /* Generales */
 function errorCallback(error) {
