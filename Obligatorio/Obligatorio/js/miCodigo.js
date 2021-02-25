@@ -64,34 +64,6 @@ function abrirMenu() {
     document.querySelector("#menu").open();
 }
 
-// function vaciarTodosLosCampos() {
-//     // Registro
-//     $("#txtRegistroNombre").val("");
-//     $("#txtRegistroApellido").val("");
-//     $("#txtRegistroDireccion").val("");
-//     $("#txtRegistroEmail").val("");
-//     $("#txtRegistroPassword").val("");
-//     $("#pRegistroMensajes").html("");
-//     // Login
-//     $("#txtLoginEmail").val("");
-//     $("#txtLoginPassword").val("");
-//     $("#pLoginMensajes").html("");
-//     // Home
-//     $("#tablaTbodyHomeRecetas").html("");
-//     $("#tablaHomeRecetas").hide();
-//     $("#pHomeMensajes").html("");
-//     //Detalle receta
-//     $("#h2DetaleRecetaNombre").html("");
-//     $("#imgDetalleRecetaImagen").attr("src", "");
-//     $("#tablaTbodyDetalleReceta").html("");
-//     $("#pDetalleRecetaPreparacion").html("");
-//     $("#divDetalleRecetaOtrosDatos").html("");
-//     $("#pDetalleRecetaMensajes").html("");
-//     $("#divDetalleRecetaContenido").hide();
-// }
-
-
-
 /* Sesión */
 function chequearSesion(despuesDeChequearSesion) {
     // Asumo que no hay usuario logueado y en caso de que si, lo actualizo.
@@ -313,7 +285,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
     });
 }
 
-//TODO: Codigo repetido?
+//TODO: Ver si podemos usar el onChange
 function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
@@ -419,6 +391,9 @@ function eliminarFavoritos() {
                     if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
+                        
+                        ons.notification.alert("Favorito Eliminado", {title: 'Favoritos'});
+                        
                     }
                 }
             }
@@ -429,6 +404,7 @@ function eliminarFavoritos() {
 
 
 function btnProductoFavoritoHandler() {
+
     let productoId = $(this).attr("myAttr");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
@@ -447,17 +423,20 @@ function btnProductoFavoritoHandler() {
                         if (productoId === unFavorito.elProducto._id) {
                             favoritosUsuario.splice(k, 1);
                             bandera = true;
+                            ons.notification.alert("Favorito Eliminado", {title: 'Favoritos'});
                         }
                     }
                 }
                 if (!bandera) {
                     favoritosUsuario.push({ elProducto });
                     bandera = true;
+                    ons.notification.alert("Favorito Guardado!", {title: 'Favoritos'});
                 }
             } else {
                 if (!existeUsuario(usuarioLogueado.email)) {
                     usuariosFavsJSON.push({ usuario: usuarioLogueado.email, favoritos: [{ elProducto }] });
                     bandera = true;
+                    ons.notification.alert("Favorito Guardado!", {title: 'Favoritos'});
                 }
             }
             i++;
@@ -465,6 +444,7 @@ function btnProductoFavoritoHandler() {
     } else {
         if (elProducto) {
             usuariosFavsJSON = [{ usuario: usuarioLogueado.email, favoritos: [{ elProducto }] }];
+            ons.notification.alert("Favorito Guardado!", {title: 'Favoritos'});
         }
     }
     window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
@@ -562,7 +542,7 @@ function verDetalleProducto(dataProducto) {
             <ons-list-item>Etiquetas: ${miProducto.etiquetas}</ons-list-item>
             <ons-list-item>Estado: ${miProducto.estado}</ons-list-item>
             <ons-list-item>Descripcion: ${miProducto.descripcion}</ons-list-item>
-            <ons-list-item>Descripcion: ${miProducto.putaje}</ons-list-item>
+            <ons-list-item>Descripcion: ${miProducto.puntaje}</ons-list-item>
             </ons-list-item>
         </ons-list>`;
 
