@@ -307,7 +307,7 @@ function crearListadoProductos(dataProductos) {
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
 }
-
+//holas
 function crearListadoFavoritos() {
     $("#divFavoritos").html("");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
