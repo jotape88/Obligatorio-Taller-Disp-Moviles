@@ -391,9 +391,7 @@ function eliminarFavoritos() {
                     if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
-
-                        ons.notification.alert("Favorito Eliminado", { title: 'Favoritos' });
-
+                        ons.notification.alert("Favorito Eliminado", {title: 'Favoritos'});
                     }
                 }
             }
@@ -565,7 +563,6 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
     //Capturo la cantidad comprada desde el input
     const cantidad = $(`#inputProd`).val();
     const sucursal = "601bf7d03b11a01a78163138"; //TODO:ver como se elije la sucursal
-
     //Si la cantidad es válida, creo el objeto para el llamado a la API
     if (cantidad && cantidad > 0) {
         const data = {
@@ -657,11 +654,11 @@ function mostrarPedidos(pedidos) {
             // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
             if (elProducto.estado == 'pendiente') {
                 unaCard += `<ons-button onclick="showPrompt()">Agregar comentario</ons-button>
-                            </ons-card>`
+                            </ons-card>`;
                 //Si el pedido no es 'pendiente', deshabilito el boton
             } else {
                 unaCard += `<ons-button onclick="showPrompt()" disabled="true">Agregar comentario</ons-button>
-                </ons-card>`
+                </ons-card>`;
             }
 
             $("#divDetallePedidos").append(unaCard);
