@@ -95,8 +95,6 @@ function chequearSesion(despuesDeChequearSesion) {
     }
 
 }
-
-
 // Carga el token en el header de la petición.
 // Si quiero que la petición esté autenticada, debo llamarla en el beforeSend de la llamada ajax.
 function cargarTokenEnRequest(jqXHR) {
@@ -277,7 +275,6 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
          * Esto se debe hacer porque el header mediante el que se manda el token
          * es un header personalizado (usualmente comienzan por x-).
          */
-
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
@@ -391,7 +388,7 @@ function eliminarFavoritos() {
                     if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
-                        ons.notification.alert("Favorito Eliminado", {title: 'Favoritos'});
+                        ons.notification.alert("Favorito Eliminado", { title: 'Favoritos' });
                     }
                 }
             }
@@ -630,16 +627,13 @@ function cargarDetallePedidos(despuesDeCargarPedidos) {
 
 function mostrarPedidos(pedidos) {
     //si hay algun pedido
-    if (pedidos.length > 0) {
-
-        const miPedido = pedidos.data;
-        let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${elProducto.urlImagen}.jpg`;
-
+    const miPedido = pedidos.data;
+    if (miPedido.length > 0) {
         //Recorro el array de pedidos y voy cargando la info
         for (let i = 0; i < miPedido.length; i++) {
-
             let elPedido = miPedido[i];
             let elProducto = elPedido.producto;
+            let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${elProducto.urlImagen}.jpg`;
             let unaCard = `<ons-card><div class="title">${elProducto.nombre}</div>
                             <ons-list>
                                 <ons-list-item tappable>
@@ -647,20 +641,20 @@ function mostrarPedidos(pedidos) {
                                 <ons-list-item>Código: ${elProducto.codigo}</ons-list-item>
                                 <ons-list-item>Etiquetas: ${elProducto.etiquetas}</ons-list-item>
                                 <ons-list-item>Estado: ${elProducto.estado}</ons-list-item>
-                                <ons-list-item>Sucursal donde retira: ${elPedido.estado}</ons-list-item>
-                                <ons-list-item>Precio total: ${elPedido.cantidad}*${elProducto.precio}</ons-list-item>
+                                <ons-list-item>Sucursal donde retira: ${elPedido.sucursal.nombre}</ons-list-item>
+                                <ons-list-item>Precio total: $ ${parseInt(elPedido.cantidad) * parseInt(elProducto.precio)}</ons-list-item>
+                                <ons-list-item>Estado del pedido: ${elPedido.estado}</ons-list-item>
                                 </ons-list-item>
                             </ons-list>`;
             // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
-            if (elProducto.estado == 'pendiente') {
-                unaCard += `<ons-button onclick="showPrompt()">Agregar comentario</ons-button>
+            if (elPedido.estado == 'pendiente') {
+                unaCard += `<ons-button onclick="showPrompt('${elPedido._id}')">Agregar comentario</ons-button>
                             </ons-card>`;
                 //Si el pedido no es 'pendiente', deshabilito el boton
             } else {
-                unaCard += `<ons-button onclick="showPrompt()" disabled="true">Agregar comentario</ons-button>
-                </ons-card>`;
+                unaCard += `<ons-button onclick="showPrompt('${elPedido._id}')" disabled="true">Agregar comentario</ons-button>
+                 </ons-card>`;
             }
-
             $("#divDetallePedidos").append(unaCard);
         }
         //Si no hay ningun pedido, muestro un cartel y navego hacia atras.
@@ -670,12 +664,34 @@ function mostrarPedidos(pedidos) {
     }
 }
 
+//Funcion que agrega el comentario
+function agregarComentario(idPedido, miComentario) {
+    console.log('idPedido: ' + idPedido);
+
+    const elComentario = {
+        comentario: miComentario
+    }
+
+    $.ajax({
+        type: 'PUT',
+        url: urlBase + `pedidos/${idPedido}`,
+        contentType: "application/json",
+        data: JSON.stringify(elComentario),
+
+        beforeSend: cargarTokenEnRequest,
+        success: navegar('catalogo', false),
+        error: errorCallback
+    });
+
+
+}
 
 //Funcion que muestra el Dialog para agregar comentario al pedido
-function showPrompt() {
+function showPrompt(idPedido) {
     ons.notification.prompt('Ingrese un comentario')
         .then(function (input) {
-            var message = input ? 'Entered: ' + input : 'Entered nothing!';
+            agregarComentario(idPedido, input)
+            var message = input ? 'Gracias por su comentario' : 'El comentario no puede estar vacio';
             ons.notification.alert(message);
 
             //TODO: falta hacer el llamado 'PUT' a la api
