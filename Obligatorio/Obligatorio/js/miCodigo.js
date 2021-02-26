@@ -392,9 +392,7 @@ function eliminarFavoritos() {
                     if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
-
                         ons.notification.alert("Favorito Eliminado", { title: 'Favoritos' });
-
                     }
                 }
             }
@@ -658,11 +656,11 @@ function mostrarPedidos(pedidos) {
             // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
             if (elProducto.estado == 'pendiente') {
                 unaCard += `<ons-button onclick="showPrompt()">Agregar comentario</ons-button>
-                            </ons-card>`
+                            </ons-card>`;
                 //Si el pedido no es 'pendiente', deshabilito el boton
             } else {
                 unaCard += `<ons-button onclick="showPrompt()" disabled="true">Agregar comentario</ons-button>
-                </ons-card>`
+                </ons-card>`;
             }
 
             $("#divDetallePedidos").append(unaCard);
