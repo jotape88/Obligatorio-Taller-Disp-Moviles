@@ -11,11 +11,12 @@ function todoCargado() {
 }
 
 function navegar(paginaDestino, resetStack, datos) {
+    console.log(datos);
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
-       // myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
-       myNavigator.pushPage(`${paginaDestino}.html`, { data: datos });
+        // myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
+        myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
     }
     cerrarMenu();
 }
@@ -556,93 +557,94 @@ function verDetalleProducto(dataProducto) {
         unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" disabled="true" float></ons-input>
         <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
         </ons-card>`;
-           }
-           $("#divDetalleProductos").html(unaCard);
-
-
-    function comprarProducto(idProd) {
-
-        //Capturo la cantidad comprada desde el input
-        const cantidad = $(`#inputProd`).val();
-        const sucursal = "Sucursal Por defecto"; //TODO:ver como se elije la sucursal
-
-        //Si la cantidad es válida, creo el objeto para el llamado a la API
-        if (cantidad && cantidad > 0) {
-            const unaCompra = {
-                "cantidad": cantidad,
-                "idProducto": idProd,
-                "idSucursal": sucursal
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: urlBase + 'pedidos',
-                contentType: "application/json",
-                data: JSON.stringify(unaCompra),
-                beforeSend: cargarTokenEnRequest,
-                success: navegar('detalleDeCompra', true, unaCompra),
-                error: errorCallback,
-                complete: despuesdeComprarProducto
-            });
-
-        } else {
-            const opciones = {
-                title: 'Error'
-            };
-            //Si la cantidad no es válida, muestro mensaje de error
-            mensaje = 'Debe seleccionar la cantidad a comprar';
-            ons.notification.alert(mensaje, opciones);
-        }
     }
+    $("#divDetalleProductos").html(unaCard);
+}
+
+function comprarProducto(idProd, despuesdeComprarProducto) {
+
+    //Capturo la cantidad comprada desde el input
+    const cantidad = $(`#inputProd`).val();
+    const sucursal = "Sucursal Por defecto"; //TODO:ver como se elije la sucursal
+
+    //Si la cantidad es válida, creo el objeto para el llamado a la API
+    if (cantidad && cantidad > 0) {
+        const data = {
+            "cantidad": cantidad,
+            "idProducto": idProd,
+            "idSucursal": sucursal
+        };
+        $.ajax({
+            type: 'POST',
+            url: urlBase + 'pedidos',
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            beforeSend: cargarTokenEnRequest,
+            success: navegar('detalleDeCompra', false, data),
+            error: errorCallback,
+            complete: despuesdeComprarProducto
+        });
+
+    } else {
+        const opciones = {
+            title: 'Error'
+        };
+        //Si la cantidad no es válida, muestro mensaje de error
+        mensaje = 'Debe seleccionar la cantidad a comprar';
+        ons.notification.alert(mensaje, opciones);
+    }
+}
 
 
-    function mostrarDatosCompra() {
-        //Tomo los datos que pasé en la funcion navegar
-        //const unaCompra = myNavigator.topPage.data;
-        const unaCompra = myNavigator.topPage.data;
+function mostrarDatosCompra() {
+    //Tomo los datos que pasé en la funcion navegar
+    //const unaCompra = myNavigator.topPage.data;
+    const unaCompra = this.data;
 
+    if (unaCompra) {
         const idProd = unaCompra.idProducto;
         const productoComprado = obtenerProductoPorID(idProd);
         const subTotal = unaCompra.cantidad * productoComprado.precio;
-
         //Escribo el mensaje a mostrar
         const mensaje = `Producto <strong>${productoComprado.nombre}</strong>.
-    <br> Cantidad comprada: <strong>${unaCompra.cantidad}</strong>.<br>
-    Sub Total: <strong> $${subTotal}</strong>`;
+                            <br> Cantidad comprada: <strong>${unaCompra.cantidad}</strong>.<br>
+                             Sub Total: <strong> $${subTotal}</strong>`;
         //Muestro el mensaje
         $("#pDetalleCompraMensaje").html(mensaje);
-
+    } else {
+        ons.notification.alert("Ocurrió un error, por favor contacte al administrador", { title: 'Oops!' });
     }
+}
 
-    //Hago el llamado a la API para mostrar todos los pedidos de un usuario
-    function cargarDetallePedidos(despuesDeCargarPedidos) {
+//Hago el llamado a la API para mostrar todos los pedidos de un usuario
+function cargarDetallePedidos(despuesDeCargarPedidos) {
 
-        $.ajax({
-            type: 'GET',
-            url: urlBase + 'pedidos',
-            contentType: "application/json",
+    $.ajax({
+        type: 'GET',
+        url: urlBase + 'pedidos',
+        contentType: "application/json",
 
-            beforeSend: cargarTokenEnRequest,
-            success: mostrarPedidos,
-            error: errorCallback,
-            complete: despuesDeCargarPedidos
-        });
+        beforeSend: cargarTokenEnRequest,
+        success: mostrarPedidos,
+        error: errorCallback,
+        complete: despuesDeCargarPedidos
+    });
 
-    }
+}
 
-    function mostrarPedidos(pedidos) {
-        //si hay algun pedido
-        if (pedidos.length > 0) {
+function mostrarPedidos(pedidos) {
+    //si hay algun pedido
+    if (pedidos.length > 0) {
 
-            const miPedido = pedidos.data;
-            let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${elProducto.urlImagen}.jpg`;
+        const miPedido = pedidos.data;
+        let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${elProducto.urlImagen}.jpg`;
 
-            //Recorro el array de pedidos y voy cargando la info
-            for (let i = 0; i < miPedido.length; i++) {
+        //Recorro el array de pedidos y voy cargando la info
+        for (let i = 0; i < miPedido.length; i++) {
 
-                let elPedido = miPedido[i];
-                let elProducto = elPedido.producto;
-                let unaCard = `<ons-card><div class="title">${elProducto.nombre}</div>
+            let elPedido = miPedido[i];
+            let elProducto = elPedido.producto;
+            let unaCard = `<ons-card><div class="title">${elProducto.nombre}</div>
                             <ons-list>
                                 <ons-list-item tappable>
                                 <ons-list-item><img src=${unaImagenUrl} style="width: 200px"></ons-list-item>
@@ -653,25 +655,25 @@ function verDetalleProducto(dataProducto) {
                                 <ons-list-item>Precio total: ${elPedido.cantidad}*${elProducto.precio}</ons-list-item>
                                 </ons-list-item>
                             </ons-list>`;
-                // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
-                if (elProducto.estado == 'pendiente') {
-                    unaCard += `<ons-button onclick="showPrompt()">Agregar comentario</ons-button>
+            // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
+            if (elProducto.estado == 'pendiente') {
+                unaCard += `<ons-button onclick="showPrompt()">Agregar comentario</ons-button>
                             </ons-card>`
-                    //Si el pedido no es 'pendiente', deshabilito el boton
-                } else {
-                    unaCard += `<ons-button onclick="showPrompt()" disabled="true">Agregar comentario</ons-button>
+                //Si el pedido no es 'pendiente', deshabilito el boton
+            } else {
+                unaCard += `<ons-button onclick="showPrompt()" disabled="true">Agregar comentario</ons-button>
                 </ons-card>`
-                }
-
-                $("#divDetallePedidos").append(unaCard);
             }
-            //Si no hay ningun pedido, muestro un cartel y navego hacia atras.
-        } else {
-            ons.notification.alert("No hay pedidos para mostrar", { title: 'Error' });
-            navegarAtras();
+
+            $("#divDetallePedidos").append(unaCard);
         }
+        //Si no hay ningun pedido, muestro un cartel y navego hacia atras.
+    } else {
+        ons.notification.alert("No hay pedidos para mostrar", { title: 'Error' });
+        navegarAtras();
     }
 }
+
 
 //Funcion que muestra el Dialog para agregar comentario al pedido
 function showPrompt() {
