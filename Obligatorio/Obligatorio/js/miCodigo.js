@@ -11,7 +11,6 @@ function todoCargado() {
 }
 
 function navegar(paginaDestino, resetStack, datos) {
-    console.log(datos);
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
@@ -392,7 +391,7 @@ function eliminarFavoritos() {
                     if (unFavorito.elProducto._id == favoritoId) {
                         losFavoritos.splice(j, 1);
                         window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
-                        ons.notification.alert("Favorito Eliminado", { title: 'Favoritos' });
+                        ons.notification.alert("Favorito Eliminado", {title: 'Favoritos'});
                     }
                 }
             }
@@ -563,8 +562,7 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
 
     //Capturo la cantidad comprada desde el input
     const cantidad = $(`#inputProd`).val();
-    const sucursal = "Sucursal Por defecto"; //TODO:ver como se elije la sucursal
-
+    const sucursal = "601bf7d03b11a01a78163138"; //TODO:ver como se elije la sucursal
     //Si la cantidad es válida, creo el objeto para el llamado a la API
     if (cantidad && cantidad > 0) {
         const data = {
