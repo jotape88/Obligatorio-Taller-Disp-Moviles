@@ -28,7 +28,8 @@
                 <ons-list>
                     <ons-list>
                         <ons-list-header id="menu-list-header">Usuario</ons-list-header>
-                        <ons-list-item onclick="navegar('home', false)" tappable>Home</ons-list-item>
+                        <ons-list-item onclick="navegar('home', false)" tappable>
+                            <ons-icon icon="fa-home"></ons-icon> Home</ons-list-item>
                         <ons-list-item onclick="navegar('catalogo', false)" tappable>Catalogo</ons-list-item>
                         <!--Saque la funcion que llama al listado, y agregue un navegar directo a el template del catalogo-->
                         <ons-list-item onclick="navegar('favoritos', false)" tappable>Favoritos</ons-list-item>
@@ -153,10 +154,14 @@
                 </div>
                 <div class="right">
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
+            <ons-card>
+                <img src="https://cdn.webshopapp.com/shops/251281/files/208187906/muddaritaville-mu-welcome-small.jpg" alt="Welcome!" style="width: 100% ">
+                             
+              </ons-card>
 
         </ons-page>
     </template>
@@ -191,8 +196,9 @@
                         Atras
                     </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
+                   
                 </div>
             </ons-toolbar>
 
@@ -235,7 +241,7 @@
                         Atras
                     </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
@@ -243,49 +249,6 @@
             </div>
         </ons-page>
     </template>
-
-    <template id="paginaProducto1.html">
-        <ons-page>
-            <ons-toolbar>
-                <div class="left">
-                    <ons-toolbar-button onclick="abrirMenu()">
-                        <ons-icon icon="md-menu"></ons-icon>
-                    </ons-toolbar-button>
-                </div>
-                <div class="center">
-                    Producto 1
-                </div>
-            </ons-toolbar>
-            <ons-card>
-                <div class="title">
-                    Lorem Ipsum 1
-                </div>
-                <div class="content">
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam velit arcu, imperdiet eu sapien
-                        quis, maximus ultricies magna. Aenean efficitur maximus orci vel auctor. Nunc viverra elit vitae
-                        auctor elementum. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac
-                        turpis egestas. Donec euismod felis magna, eu faucibus arcu dapibus eget. Curabitur rhoncus
-                        fringilla sem, at cursus elit lacinia eu. In in tincidunt mauris. In posuere, eros id viverra
-                        suscipit, turpis est ultricies ipsum, vitae sagittis urna est quis orci. Sed quis augue
-                        porttitor, dictum ipsum eu, ullamcorper tellus. Cras et risus a mauris blandit dapibus. Cras
-                        fringilla enim mauris, sed dictum turpis gravida ac. Sed quis elit eros. Morbi elementum rhoncus
-                        condimentum. Morbi lacinia purus vitae massa hendrerit accumsan. Maecenas pretium posuere
-                        dignissim.
-                    </p>
-                    <div>
-                        <ons-input id="inputCantidad1" modifier="underbar" placeholder="Cantidad" type="number" float>
-                        </ons-input>
-                        <ons-button numero-card="1" onclick="comprar(1)">Comprar</ons-button>
-                    </div>
-                </div>
-            </ons-card>
-        </ons-page>
-    </template>
-
-
-
-
 
     <template id="detalleProducto.html">
         <ons-page>
@@ -314,7 +277,7 @@
                         Atras
                     </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
@@ -351,7 +314,7 @@
                         Atras
                     </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
@@ -394,13 +357,13 @@
                         Atras
                     </ons-toolbar-button>
                     <ons-toolbar-button onclick="cerrarSesion()">
-                        Cerrar Sesion
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
             <div id="divDetallePedidos" class="content">
             </div>
-            
+
 
         </ons-page>
     </template>
