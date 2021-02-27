@@ -198,15 +198,12 @@
                     <ons-toolbar-button onclick="cerrarSesion()">
                         <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
-                   
+                                 
                 </div>
             </ons-toolbar>
 
-            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Filtro por nombre" value=""
-                float></ons-search-input>
-            <ons-button class="button button--material--flat" id="btnFiltroProductos"
-                onclick="filtrarProductosXNombre()">Filtrar</ons-button>
-
+            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..." value=""  onkeyup=filtrarProductos() float></ons-search-input>  
+            
             <div id="divProductosCatalogo">
             </div>
         </ons-page>
