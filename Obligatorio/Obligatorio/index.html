@@ -162,6 +162,7 @@
     </template>
 
 
+    <!-- //TODO: CENTRAR LOS CATALOGOS -->
     <template id="catalogo.html">
         <ons-page>
             <script>
@@ -196,10 +197,11 @@
                 </div>
             </ons-toolbar>
 
-            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Filtro por nombre" value=""
-                float></ons-search-input>
-            <ons-button class="button button--material--flat" id="btnFiltroProductos"
-                onclick="filtrarProductosXNombre()">Filtrar</ons-button>
+            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..." value=""  onkeyup=filtrarProductosXNombre() float></ons-search-input>  
+            <ons-search-input id="txtFiltroProductosEtiqueta" modifier="underbar" placeholder="Buscar por etiquetas..." value="" onkeyup=filtrarProductosXEtiqueta() float ></ons-search-input>
+            
+            <!-- <ons-button class="button button--material--flat" id="btnFiltroProductosTitulo" onclick=filtrarProductosXNombre()>Filtrar por titulo</ons-button> -->        
+            <!-- <ons-button class="button button--material--flat" id="btnFiltroProductosEtiquetas" onclick=filtrarProductosXEtiqueta()>Filtrar por etiqueta</ons-button> -->
 
             <div id="divProductosCatalogo">
             </div>
