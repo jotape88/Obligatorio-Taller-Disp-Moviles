@@ -51,6 +51,7 @@ let usuarioLogueado;
 let tokenGuardado;
 // Productos
 const productos = [];
+const lasSucursales = [];
 
 
 /******************************
@@ -146,28 +147,22 @@ function registroRegistrarseHandler() {
                                 error: errorCallback
                             });
                         } else {
-                            mensaje = 'La dirección debe contener un nombre de calle y un numero de puerta';
-                            ons.notification.alert(mensaje, opciones);
+                            ons.notification.alert('La dirección debe contener un nombre de calle y un numero de puerta', opciones);
                         }
                     } else {
-                        mensaje = 'El apellido no puede estar vacío o contener un solo caracter';
-                        ons.notification.alert(mensaje, opciones);
+                        ons.notification.alert('El apellido no puede estar vacío o contener un solo caracter', opciones);
                     }
                 } else {
-                    mensaje = 'El nombre no puede estar vacío o contener un solo caracter';
-                    ons.notification.alert(mensaje, opciones);
+                    ons.notification.alert('El nombre no puede estar vacío o contener un solo caracter', opciones);
                 }
             } else {
-                mensaje = 'La contraseña debe tener al menos 8 caracteres';
-                ons.notification.alert(mensaje, opciones);
+                ons.notification.alert('La contraseña debe tener al menos 8 caracteres', opciones);
             }
         } else {
-            mensaje = 'Los passwords no coinciden';
-            ons.notification.alert(mensaje, opciones);
+            ons.notification.alert('Los passwords no coinciden', opciones);
         }
     } else {
-        mensaje = 'El formato del correo no es válido';
-        ons.notification.alert(mensaje, opciones);
+        ons.notification.alert('El formato del correo no es válido', opciones);
     }
 }
 
@@ -283,7 +278,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
 }
 
 //TODO: Ver si podemos usar el onChange
-function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
+function filtrarProductos(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
     $.ajax({
@@ -300,11 +295,67 @@ function filtrarProductosXNombre(despuesDeCargarListadoProductos) {
             nombre: texto
         },
         beforeSend: cargarTokenEnRequest,
-        success: crearListadoProductos,
+        //success: crearListadoProductos,  
+        success: buscarNombreOEti,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
     });
 }
+
+function buscarNombreOEti(pData){
+    if(pData.data.length > 0){
+        crearListadoProductos(pData);
+    } else {
+        filtrarProductosXEtiqueta();
+    }
+}
+
+function filtrarProductosXEtiqueta(){
+    //let textoIngresado = $("#txtFiltroProductosEtiqueta").val();
+    let textoIngresado = $("#txtFiltroProductos").val();
+    textoIngresado = textoIngresado.toLowerCase();
+    let arrayFiltrados = {data: Array(), error: ""};
+    for (let i = 0; i < productos.length; i++) {
+        let unProd = productos[i];
+        let unaEtiqueta = unProd.etiquetas;
+        let x = 0;
+        let encontrado = false;
+        while(!encontrado && x < unaEtiqueta.length){
+            let etiquetaX = unaEtiqueta[x];
+            //if(esSubcadena(etiquetaX, textoIngresado)) {
+            if(etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
+                arrayFiltrados.data.push(unProd);
+                encontrado = true;
+            }
+            x++;
+        }
+    }
+    crearListadoProductos(arrayFiltrados);
+}
+
+// function esSubcadena(pCadena, pSubCadena) {
+//     let siEsSubCadena = false;
+//     let x = 0; 
+//     while (!siEsSubCadena && x < pCadena.length) { 
+//         let iteSubCadena = 0; 
+//         let iteCadena = x; 
+//         let banderaSubCadena = true;
+//         while (banderaSubCadena && iteSubCadena < pSubCadena.length && iteCadena < pCadena.length) {
+//             let carCadena = pCadena.charAt(iteCadena);
+//             let carSubCadena = pSubCadena.charAt(iteSubCadena);
+//             if (carCadena !== carSubCadena) {
+//                 banderaSubCadena = false; 
+//             }
+//             iteCadena++;
+//             iteSubCadena++;
+//         }
+//         if (banderaSubCadena && iteSubCadena === pSubCadena.length) {
+//             siEsSubCadena = true;
+//         }
+//         x++;
+//     }
+//     return siEsSubCadena;
+// }
 
 //TODO: hacer filtro de productos por etiquetas.
 
@@ -312,6 +363,7 @@ function crearListadoProductos(dataProductos) {
     //Navego al template Catalogo
     //navegar('catalogo', false, dataProductos); - **llamando al catalogo entra en un loop infinito***
     // Vacío el array de productos.
+    $("#divProductosCatalogo").html(""); //Limpiamos el catalogo para filtrar por etiquetas
     productos.splice(0, productos.length);
     if (dataProductos && dataProductos.data.length > 0) {
         for (let i = 0; i < dataProductos.data.length; i++) {
@@ -543,49 +595,86 @@ function verDetalleProducto(dataProducto) {
         </ons-list>`;
     //Si hay stock del producto, muestro un botón para comprar
     if (miProducto.estado == "en stock") {
-        unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto("${miProducto._id}")'>Comprar</ons-button>
+        unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input><br>
+        <select id="selectSucursales"></select><br>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='comprarProducto("${miProducto._id}")'>Comprar</ons-button>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='navegar("mapa", false)'>Ver mapa</ons-button>
         </ons-card>`;
         //Si no hay stock, deshabilito el boton
     } else {
         unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" disabled="true" float></ons-input>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" id='btnProd_${miProducto._id}' onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
+        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
         </ons-card>`;
     }
     $("#divDetalleProductos").html(unaCard);
 }
 
+function cargarSucursales(despuesDeCargarSucursales){
+    $.ajax({
+        type: 'GET',
+        url: urlBase + 'sucursales',
+        beforeSend: cargarTokenEnRequest,
+        success: crearCombo,
+        error: errorCallback,
+        complete: despuesDeCargarSucursales
+    });
+}
+
+function crearCombo(pData) {
+    let sucursales = pData.data;
+    let elCombo = `<option value=-1>Seleccione una sucursal</option>`;
+    for(let i = 0; i < sucursales.length; i++) {
+        let unaSucursal = sucursales[i];
+        let sucX = new Sucursal(unaSucursal._id, unaSucursal.nombre, unaSucursal.direccion, unaSucursal.ciudad, unaSucursal.pais);
+        lasSucursales.push(sucX);
+        elCombo += `<option value="${unaSucursal._id}">${unaSucursal.nombre}</option>`;
+    }
+    $("#selectSucursales").html(elCombo);
+}
+
+
+function cargarDatosCompra(){
+    mostrarDatosCompra();
+
+}
+
+
 function comprarProducto(idProd, despuesdeComprarProducto) {
 
     //Capturo la cantidad comprada desde el input
     const cantidad = $(`#inputProd`).val();
-    const sucursal = "601bf7d03b11a01a78163138"; //TODO:ver como se elije la sucursal
+    const sucursal =  $(`#selectSucursales`).val(); //TODO:ver como se elije la sucursal
     //Si la cantidad es válida, creo el objeto para el llamado a la API
-    if (cantidad && cantidad > 0) {
-        const data = {
-            "cantidad": cantidad,
-            "idProducto": idProd,
-            "idSucursal": sucursal
-        };
-        $.ajax({
-            type: 'POST',
-            url: urlBase + 'pedidos',
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            beforeSend: cargarTokenEnRequest,
-            success: navegar('detalleDeCompra', false, data),
-            error: errorCallback,
-            complete: despuesdeComprarProducto
-        });
 
+    if(sucursal !== null && sucursal != -1) {      
+        if (cantidad && cantidad > 0) {
+            const data = {
+                "cantidad": cantidad,
+                "idProducto": idProd,
+                "idSucursal": sucursal
+            };
+            $.ajax({
+                type: 'POST',
+                url: urlBase + 'pedidos',
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                beforeSend: cargarTokenEnRequest,
+                success: navegar('detalleDeCompra', false, data),
+                error: errorCallback,
+                complete: despuesdeComprarProducto
+            });
+    
+        } else {
+            const opciones = {
+                title: 'Error'
+            };
+            //Si la cantidad no es válida, muestro mensaje de error
+            mensaje = 'Debe seleccionar la cantidad a comprar';
+            ons.notification.alert(mensaje, opciones);
+        }
     } else {
-        const opciones = {
-            title: 'Error'
-        };
-        //Si la cantidad no es válida, muestro mensaje de error
-        mensaje = 'Debe seleccionar la cantidad a comprar';
-        ons.notification.alert(mensaje, opciones);
-    }
+        ons.notification.alert("Seleccione una sucursal", {title: "Error"})
+    }  
 }
 
 
@@ -711,3 +800,104 @@ function cerrarMenu() {
     document.querySelector("#menu").close();
 }
 
+
+
+
+//EL CODIGO DEL MAPA
+let posicionDelUsuario;
+let miMapa;
+
+function cargarPosicionDelUsuario() {
+    window.navigator.geolocation.getCurrentPosition(
+        // Callback de éxito.
+        function (pos) {
+            posicionDelUsuario = {
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude
+            }
+            inicializarMapa();
+        },
+        // Calback de error.
+        function () {
+            posicionDelUsuario = {
+                latitude: -34.903816878014354,
+                longitude: -56.19059048108193
+            };
+            inicializarMapa();
+        }
+    );
+}
+
+function inicializarMapa() {
+    // Guardo referencia global a mi mapa.
+    miMapa = L.map("contenedorDeMapa").setView([posicionDelUsuario.latitude, posicionDelUsuario.longitude], 13);
+    // Vacío el mapa.
+    miMapa.eachLayer(m => m.remove());
+
+    // Dibujo la cartografía base.
+    L.tileLayer(
+        "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNhaWFmYSIsImEiOiJjanh4cThybXgwMjl6M2RvemNjNjI1MDJ5In0.BKUxkp2V210uiAM4Pd2YWw",
+        {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            id: "mapbox/streets-v11",
+            accessToken: "your.mapbox.access.token"
+        }
+    ).addTo(miMapa);
+    dibujarPosicionDelUsuarioHandler();
+    encontrarSucursales();
+}
+
+function dibujarPosicionDelUsuarioHandler() {
+    L.marker([posicionDelUsuario.latitude, posicionDelUsuario.longitude]).addTo(miMapa).bindPopup('Ubicación del usuario').openPopup();
+    miMapa.panTo(new L.LatLng(posicionDelUsuario.latitude, posicionDelUsuario.longitude));
+}
+
+function encontrarSucursales(){
+    for (let i = 0; i < lasSucursales.length; i++) {
+        let unaSucu = lasSucursales[i];
+        buscarDireccion(unaSucu.direccion, unaSucu.ciudad, unaSucu.pais, unaSucu.nombre);
+    }
+}
+
+
+//Función que usa la API de OpenStreetMap para buscar las coordenadas de una dirección.
+function buscarDireccion(pDireccion, pCiudad, pPais, pNombre) {
+    let urlX = `https://nominatim.openstreetmap.org/search?format=json&q=${pDireccion},${pCiudad},${pPais}`;
+    console.log(urlX);
+    $.ajax({
+        type: 'GET',
+        url: urlX,
+        contentType: "application/json",
+        success: function (data) {
+            if (data.length > 0) {
+                // L.marker([data[0].lat, data[0].lon]).addTo(miMapa).bindPopup(direccionBuscada);
+                // miMapa.panTo(new L.LatLng(data[0].lat, data[0].lon));
+                dibujarDistancia(data[0].lat, data[0].lon, pNombre);
+            } else {
+                alert("No se han encontrado datos");
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
+
+// Función que se encarga de dibujar un punto en el mapa y agregar una una línea desde la posición del usuario hasta el punto dibujado.
+//TODO: si da tiempo, que se muestre despues del onshow o mostrar un loading
+function dibujarDistancia(lat, lon, nombre) {
+    // Dibujo el punto en el mapa.
+    L.marker([lat, lon]).addTo(miMapa).bindPopup(nombre).openPopup();
+    // Array con los puntos del mapa que voy a usar para la línea.
+    const puntosLinea = [
+        [posicionDelUsuario.latitude, posicionDelUsuario.longitude],
+        [lat, lon]
+    ];
+    // Calculo la distancia usando la librería. Divido entre 1000 para obtener los km y me quedo con 2 decimales.
+    const distancia = Number(miMapa.distance([posicionDelUsuario.latitude, posicionDelUsuario.longitude], [lat, lon]) / 1000).toFixed(2);
+    // Dibujo una línea amarilla con un pop up mostrando la distancia.
+    const polyline = L.polyline(puntosLinea, { color: 'yellow' }).addTo(miMapa).bindPopup(`Distancia ${distancia} km.`).openPopup();;
+    // Centro el mapa en la línea.
+    miMapa.fitBounds(polyline.getBounds());
+}

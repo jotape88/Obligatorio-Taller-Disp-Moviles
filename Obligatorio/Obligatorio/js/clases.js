@@ -37,3 +37,19 @@ class Producto{
         this.etiquetas = pEtiquetas;
     }
 }
+
+class Sucursal{
+    constructor(
+        p_Id,
+        pNombre,
+        pDireccion,
+        pCiudad,
+        pPais
+    ) {
+        this._id = p_Id;
+        this.nombre = pNombre;
+        this.direccion = pDireccion;
+        this.ciudad = pCiudad;
+        this.pais = pPais;
+    }
+}
