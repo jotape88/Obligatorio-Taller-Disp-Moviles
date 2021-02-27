@@ -14,6 +14,10 @@
     <script type="text/javascript" src="js/jQuery.js"></script>
     <script type="text/javascript" src="js/clases.js"></script>
     <script type="text/javascript" src="js/miCodigo.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+
 
     <title>Pantallas - Eventos de carga y pasaje de parámetros</title>
 </head>
@@ -198,15 +202,12 @@
                     <ons-toolbar-button onclick="cerrarSesion()">
                         <ons-icon icon= "fa-sign-out-alt"></ons-icon>
                     </ons-toolbar-button>
-                   
+                                 
                 </div>
             </ons-toolbar>
 
-            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Filtro por nombre" value=""
-                float></ons-search-input>
-            <ons-button class="button button--material--flat" id="btnFiltroProductos"
-                onclick="filtrarProductosXNombre()">Filtrar</ons-button>
-
+            <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..." value=""  onkeyup=filtrarProductos() float></ons-search-input>  
+            
             <div id="divProductosCatalogo">
             </div>
         </ons-page>
@@ -253,7 +254,10 @@
     <template id="detalleProducto.html">
         <ons-page>
             <script>
-                ons.getScriptPage().onShow = cargarDetalleProducto;
+                ons.getScriptPage().onShow = function(){
+                    cargarDetalleProducto();
+                    cargarSucursales();
+                };
             </script>
             <script>
                 document.addEventListener('init', function (event) {
@@ -290,7 +294,7 @@
     <template id="detalleDeCompra.html">
         <ons-page>
             <script>
-                ons.getScriptPage().onShow = mostrarDatosCompra;
+                ons.getScriptPage().onShow = mostrarDatosCompra;               
             </script>
             <script>
                 document.addEventListener('init', function (event) {
@@ -363,10 +367,44 @@
             </ons-toolbar>
             <div id="divDetallePedidos" class="content">
             </div>
-
-
         </ons-page>
     </template>
+
+    <template id="mapa.html">
+        <ons-page>
+            <script>
+                ons.getScriptPage().onShow = cargarPosicionDelUsuario;
+            </script>
+            <script>
+                document.addEventListener('init', function (event) {
+                    if (event.target.matches('#detalleProducto')) {
+                        ons.notification.alert('Page 1 is initiated.');
+                        // Set up content...
+                    }
+                }, false);
+            </script>
+            <ons-toolbar>
+                <div class="left">
+                    <ons-toolbar-button onclick="abrirMenu()">
+                        <ons-icon icon="md-menu"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+                <div class="center">
+                    Mis Pedidos
+                </div>
+                <div class="right">
+                    <ons-toolbar-button onclick="navegarAtras()">
+                        Atras
+                    </ons-toolbar-button>
+                    <ons-toolbar-button onclick="cerrarSesion()">
+                        <ons-icon icon= "fa-sign-out-alt"></ons-icon>
+                    </ons-toolbar-button>
+                </div>
+            </ons-toolbar>
+            <div id="contenedorDeMapa" style="width: 100%; height: 500px;"></div>
+        </ons-page>
+    </template>
+
 </body>
 
 </html>
