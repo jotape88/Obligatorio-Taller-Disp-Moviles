@@ -3,7 +3,30 @@
 /******************************
  * Inicialización
  ******************************/
+document.addEventListener("deviceready", onDeviceReady, false);
 ons.ready(todoCargado);
+
+document.addEventListener(
+    "offline",
+    function () {
+        myNavigator.pushPage("offline.html");
+    },
+    false
+);
+
+// Le decimos qué hacer cuando el dispositivo vuelve a tener acceso a internet.
+document.addEventListener(
+    "online",
+    function () {
+        myNavigator.popPage();
+    },
+    false
+);
+
+function onDeviceReady() {
+    // Pido permisos para usar la camara.
+    QRScanner.prepare(prepareCallback);
+}
 
 function todoCargado() {
     yNavigator = document.querySelector('#myNavigator');
@@ -900,4 +923,106 @@ function dibujarDistancia(lat, lon, nombre) {
     const polyline = L.polyline(puntosLinea, { color: 'yellow' }).addTo(miMapa).bindPopup(`Distancia ${distancia} km.`).openPopup();;
     // Centro el mapa en la línea.
     miMapa.fitBounds(polyline.getBounds());
+}
+
+
+function prepareCallback(err, status) {
+    if (err) {
+        // En caso de cualquier tipo de error.
+        ons.notification.alert(JSON.stringify(err));
+    }
+    if (status.authorized) {
+        // Tenemos acceso y el escaner está inicializado.
+    } else if (status.denied) {
+        // El usuario rechazó el pedido, la pantalla queda en negro.
+        ons.notification.alert('status.denied');
+        // Podemos volver a preguntar mandando al usuario a la configuración de permisos con QRScanner.openSettings().
+    } else {
+        // Nos rechazaron solo por esta vez. Podríamos volver a hacer el pedido.
+        ons.notification.toast("Nos cancelaron una sola vez", { timeout: 2000 });
+    }
+}
+
+// Función que me lleva a la pantalla de escaneo.
+function irAlScan() {
+    navegar("qrPage", false);
+}
+
+// Función que se dispara al ingresar a la página de escaneo.
+function escanear() {
+    // Si hay scanner
+    if (window.QRScanner) {
+        // Esto lo uso para mostrar la cam en la app.
+        // Por defecto la vista previa queda por encima del body y el html.
+        // Pero por un tema de compatibilidad con Onsen, queda por debajo de la page.
+        // Mirar el css y ver cómo hay que hacer que esta page sea transparente para que se vea la cámara.
+        window.QRScanner.show(
+            function (status) {
+                // Función de scan y su callback
+                window.QRScanner.scan(scanCallback);
+            }
+        );
+    }
+}
+
+function scanCallback(err, text) {
+    if (err) {
+        // Ocurrió un error o el escaneo fue cancelado(error code '6').
+        ons.notification.alert(JSON.stringify(err));
+    } else {
+        // Si no hay error escondo el callback y vuelvo a la pantalla anterior pasando el string que se escaneó con la url del producto.
+        QRScanner.hide();
+        //myNavigator.popPage({ data: { scanText: text } });
+        cargarQrPage(text);
+    }
+}
+
+// Función que carga el home, si hay algo escaneado trae el producto y lo muestra
+function cargarQrPage(text, despuesCargarQrPage) {
+    // Si me pasaron datos por parámetro en la navegación.
+    // Hacer this.data es lo mismo que hacer myNavigator.topPage.data
+    if (text) {
+        ons.notification.alert(text);
+        $.ajax({
+            type: "GET",
+            url: text,
+            contentType: "application/json",
+            beforeSend: cargarTokenEnRequest,
+            success: mostrarProductoEscaneado,
+            error: errorCallback,
+            complete: despuesCargarQrPage
+        });
+    }
+}  
+
+function mostrarProductoEscaneado(pResponse){
+    navegar('qrPage', false);
+    ons.notification.toast("success", { timeout: 1500 });
+    let r = pResponse.data[0];
+    ons.notification.toast(JSON.stringify(r), { timeout: 5000 });
+    let unaCard =
+    `
+    <ons-list-item>
+        <div class="left">
+            <img class="list-item__thumbnail" src="http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${r.urlImagen}.jpg">
+        </div>
+        <div class="center">
+            <span class="list-item__title">${r.nombre}</span>
+            <span class="list-item__subtitle">${r.etiquetas.join(',')}</span>
+        </div>
+        <div class="right">
+            <span class="list-item__title">$${r.precio}</span>
+        </div>
+    </ons-list-item>
+    `;
+    $('#productos-list').html(unaCard);
+}
+
+
+function irAlFalsoScan () {
+    myNavigator.pushPage("falsoScan.html");
+}
+function falsoScan() {   
+    //myNavigator.popPage({data: {scanText: 'http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001'}});
+    cargarQrPage('http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001');
 }

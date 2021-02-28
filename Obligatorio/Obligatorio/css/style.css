@@ -1,0 +1,9 @@
+.page--material, .page--material__background {
+    background-color: white;
+}
+
+#qrPage .page__content.page--material__content,
+#qrPage .page__background.page--material__background {
+    background-color: transparent !important;
+    
+}
