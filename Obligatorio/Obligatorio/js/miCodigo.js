@@ -3,9 +3,11 @@
 /******************************
  * Inicialización
  ******************************/
+
 document.addEventListener("deviceready", onDeviceReady, false);
 ons.ready(todoCargado);
 
+//Le decimos que hacer cuando el dispositivo no tiene acceso a internet
 document.addEventListener(
     "offline",
     function () {
@@ -33,6 +35,7 @@ function todoCargado() {
     inicializar();
 }
 
+//Función para entre los distintos templates
 function navegar(paginaDestino, resetStack, datos) {
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
@@ -43,6 +46,7 @@ function navegar(paginaDestino, resetStack, datos) {
     cerrarMenu();
 }
 
+//Funcion que se llama para navegar hacia la pagina anterior
 function navegarAtras() {
     myNavigator.popPage();
     cerrarMenu();
@@ -64,6 +68,7 @@ function inicializar() {
     });
 }
 
+//#region Variables Globales
 /******************************
  * Variables globales
  ******************************/
@@ -74,9 +79,11 @@ let usuarioLogueado;
 let tokenGuardado;
 // Productos
 const productos = [];
+//Sucursales
 const lasSucursales = [];
+//#endregion
 
-
+//#region Funcionalidades del sistema
 /******************************
  * Funcionalidades del sistema
  ******************************/
@@ -88,6 +95,14 @@ function abrirMenu() {
     document.querySelector("#menu").open();
 }
 
+// Carga el token en el header de la petición.
+// Si quiero que la petición esté autenticada, debo llamarla en el beforeSend de la llamada ajax.
+function cargarTokenEnRequest(jqXHR) {
+    jqXHR.setRequestHeader("x-auth", tokenGuardado);
+}
+//#endregion
+
+//#region Sesion
 /* Sesión */
 function chequearSesion(despuesDeChequearSesion) {
     // Asumo que no hay usuario logueado y en caso de que si, lo actualizo.
@@ -119,11 +134,6 @@ function chequearSesion(despuesDeChequearSesion) {
     }
 
 }
-// Carga el token en el header de la petición.
-// Si quiero que la petición esté autenticada, debo llamarla en el beforeSend de la llamada ajax.
-function cargarTokenEnRequest(jqXHR) {
-    jqXHR.setRequestHeader("x-auth", tokenGuardado);
-}
 
 function cerrarSesion() {
     // Así remuevo específicamente el token guardado.
@@ -133,7 +143,9 @@ function cerrarSesion() {
     //inicializar();
     navegar('login', true);
 }
+//#endregion
 
+//#region Registro
 /* Registro */
 function registroRegistrarseHandler() {
     let nombreIngresado = $("#txtRegistroNombre").val();
@@ -189,6 +201,11 @@ function registroRegistrarseHandler() {
     }
 }
 
+//#endregion
+
+//#region Validaciones
+
+//funcion que valida el mail
 function validarCorreo(pCorreo) {
     let esValido = false;
     if (pCorreo.trim().length >= 6) {
@@ -211,18 +228,20 @@ function validarCorreo(pCorreo) {
     return esValido;
 }
 
+//funcion que valida el largo del password
 function validarPassword(pPassword) {
     return pPassword.trim().length >= 8;
 }
 
+//funcion que valida el nombre
 function validarNombre(pNombre) {
     return pNombre.trim().length >= 1;
 }
-
+//funcion que valida el apellido
 function validarApellido(pApellido) {
     return pApellido.trim().length >= 1;
 }
-
+//funcion que valida la direccion
 function validarDireccion(pDireccion) {
     let esValido = false;
     if (pDireccion.trim().length >= 1) {
@@ -241,7 +260,9 @@ function validarDireccion(pDireccion) {
     }
     return esValido;
 }
+//#endregion
 
+//#region  Login
 /* Login */
 function loginIniciarSesionHandler() {
     let emailIngresado = $("#txtLoginEmail").val();
@@ -280,6 +301,9 @@ function iniciarSesion(dataUsuario) {
     //mostrarMenuUsuarioAutenticado();
     navegar('home', true, dataUsuario);
 }
+//#endregion
+
+//#region catalogo de productos 
 
 /* Catalogo */
 function cargarListadoProductos(despuesDeCargarListadoProductos) {
@@ -299,54 +323,54 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
         complete: despuesDeCargarListadoProductos
     });
 }
+//#endregion
 
-//TODO: Ver si podemos usar el onChange
+//#region Filto de productos
+
+//Filtrar productos
+
+//Función que hace un llamado a la Api 
 function filtrarProductos(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
     $.ajax({
         type: 'GET',
         url: urlBase + 'productos',
-        /**
-         * El beforeSend lo uso para cargar el token en el header de la petición y
-         * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
-         * ejecutar antes de enviar la petición (beforeSend).
-         * Esto se debe hacer porque el header mediante el que se manda el token
-         * es un header personalizado (usualmente comienzan por x-).
-         */
         data: {
             nombre: texto
         },
         beforeSend: cargarTokenEnRequest,
-        //success: crearListadoProductos,  
         success: buscarNombreOEti,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
     });
 }
 
-function buscarNombreOEti(pData){
-    if(pData.data.length > 0){
+//SI el resultado del llamado a la API es success:
+function buscarNombreOEti(pData) {
+    //Si hay productos con ese nombre, los trae
+    if (pData.data.length > 0) {
         crearListadoProductos(pData);
+    //Si no encontró por nombre, busca por etiquetas
     } else {
         filtrarProductosXEtiqueta();
     }
 }
 
-function filtrarProductosXEtiqueta(){
+function filtrarProductosXEtiqueta() {
     //let textoIngresado = $("#txtFiltroProductosEtiqueta").val();
     let textoIngresado = $("#txtFiltroProductos").val();
     textoIngresado = textoIngresado.toLowerCase();
-    let arrayFiltrados = {data: Array(), error: ""};
+    let arrayFiltrados = { data: Array(), error: "" };
     for (let i = 0; i < productos.length; i++) {
         let unProd = productos[i];
         let unaEtiqueta = unProd.etiquetas;
         let x = 0;
         let encontrado = false;
-        while(!encontrado && x < unaEtiqueta.length){
+        while (!encontrado && x < unaEtiqueta.length) {
             let etiquetaX = unaEtiqueta[x];
             //if(esSubcadena(etiquetaX, textoIngresado)) {
-            if(etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
+            if (etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
                 arrayFiltrados.data.push(unProd);
                 encontrado = true;
             }
@@ -356,36 +380,10 @@ function filtrarProductosXEtiqueta(){
     crearListadoProductos(arrayFiltrados);
 }
 
-// function esSubcadena(pCadena, pSubCadena) {
-//     let siEsSubCadena = false;
-//     let x = 0; 
-//     while (!siEsSubCadena && x < pCadena.length) { 
-//         let iteSubCadena = 0; 
-//         let iteCadena = x; 
-//         let banderaSubCadena = true;
-//         while (banderaSubCadena && iteSubCadena < pSubCadena.length && iteCadena < pCadena.length) {
-//             let carCadena = pCadena.charAt(iteCadena);
-//             let carSubCadena = pSubCadena.charAt(iteSubCadena);
-//             if (carCadena !== carSubCadena) {
-//                 banderaSubCadena = false; 
-//             }
-//             iteCadena++;
-//             iteSubCadena++;
-//         }
-//         if (banderaSubCadena && iteSubCadena === pSubCadena.length) {
-//             siEsSubCadena = true;
-//         }
-//         x++;
-//     }
-//     return siEsSubCadena;
-// }
 
-//TODO: hacer filtro de productos por etiquetas.
+
 
 function crearListadoProductos(dataProductos) {
-    //Navego al template Catalogo
-    //navegar('catalogo', false, dataProductos); - **llamando al catalogo entra en un loop infinito***
-    // Vacío el array de productos.
     $("#divProductosCatalogo").html(""); //Limpiamos el catalogo para filtrar por etiquetas
     productos.splice(0, productos.length);
     if (dataProductos && dataProductos.data.length > 0) {
@@ -393,7 +391,6 @@ function crearListadoProductos(dataProductos) {
             let unProducto = dataProductos.data[i];
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
             productos.push(prodX);
-            //let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div class="content"><p>Precio: $${unProducto.precio}</p><p>${unProducto.foto}</p><p>Código: ${unProducto.codigo}</p><p>Etiquetas: ${unProducto.etiquetas}</p><p>Estado: ${unProducto.estado}</p></div></ons-card>`;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
             let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
                 <ons-list>
@@ -405,17 +402,19 @@ function crearListadoProductos(dataProductos) {
                     <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
                     </ons-list-item>
                 </ons-list>
-                <ons-button style="margin-bottom: -14px;" modifier="quiet" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
+                <ons-button style="margin-bottom: -14px;" modifier="large" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
                 </ons-card>`;
 
 
             $("#divProductosCatalogo").append(unaCard);
 
         }
+
+        
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
 }
-//holas
+
 function crearListadoFavoritos() {
     $("#divFavoritos").html("");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
@@ -431,7 +430,7 @@ function crearListadoFavoritos() {
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
                     let unaCard =
-                    `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
+                        `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
                         <ons-list>
                             <ons-list-item tappable>
                                 <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
@@ -633,7 +632,7 @@ function verDetalleProducto(dataProducto) {
     $("#divDetalleProductos").html(unaCard);
 }
 
-function cargarSucursales(despuesDeCargarSucursales){
+function cargarSucursales(despuesDeCargarSucursales) {
     $.ajax({
         type: 'GET',
         url: urlBase + 'sucursales',
@@ -647,7 +646,7 @@ function cargarSucursales(despuesDeCargarSucursales){
 function crearCombo(pData) {
     let sucursales = pData.data;
     let elCombo = `<option value=-1>Seleccione una sucursal</option>`;
-    for(let i = 0; i < sucursales.length; i++) {
+    for (let i = 0; i < sucursales.length; i++) {
         let unaSucursal = sucursales[i];
         let sucX = new Sucursal(unaSucursal._id, unaSucursal.nombre, unaSucursal.direccion, unaSucursal.ciudad, unaSucursal.pais);
         lasSucursales.push(sucX);
@@ -657,7 +656,7 @@ function crearCombo(pData) {
 }
 
 
-function cargarDatosCompra(){
+function cargarDatosCompra() {
     mostrarDatosCompra();
 
 }
@@ -667,10 +666,10 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
 
     //Capturo la cantidad comprada desde el input
     const cantidad = $(`#inputProd`).val();
-    const sucursal =  $(`#selectSucursales`).val(); //TODO:ver como se elije la sucursal
+    const sucursal = $(`#selectSucursales`).val();
     //Si la cantidad es válida, creo el objeto para el llamado a la API
 
-    if(sucursal !== null && sucursal != -1) {      
+    if (sucursal !== null && sucursal != -1) {
         if (cantidad && cantidad > 0) {
             const data = {
                 "cantidad": cantidad,
@@ -687,7 +686,7 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
                 error: errorCallback,
                 complete: despuesdeComprarProducto
             });
-    
+
         } else {
             const opciones = {
                 title: 'Error'
@@ -697,8 +696,8 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
             ons.notification.alert(mensaje, opciones);
         }
     } else {
-        ons.notification.alert("Seleccione una sucursal", {title: "Error"})
-    }  
+        ons.notification.alert("Seleccione una sucursal", { title: "Error" })
+    }
 }
 
 
@@ -806,8 +805,6 @@ function showPrompt(idPedido) {
             agregarComentario(idPedido, input)
             var message = input ? 'Gracias por su comentario' : 'El comentario no puede estar vacio';
             ons.notification.alert(message);
-
-            //TODO: falta hacer el llamado 'PUT' a la api
         });
 }
 
@@ -876,7 +873,7 @@ function dibujarPosicionDelUsuarioHandler() {
     miMapa.panTo(new L.LatLng(posicionDelUsuario.latitude, posicionDelUsuario.longitude));
 }
 
-function encontrarSucursales(){
+function encontrarSucursales() {
     for (let i = 0; i < lasSucursales.length; i++) {
         let unaSucu = lasSucursales[i];
         buscarDireccion(unaSucu.direccion, unaSucu.ciudad, unaSucu.pais, unaSucu.nombre);
@@ -951,6 +948,7 @@ function irAlScan() {
 
 // Función que se dispara al ingresar a la página de escaneo.
 function escanear() {
+    alert("entro a la funcion escanear")
     // Si hay scanner
     if (window.QRScanner) {
         // Esto lo uso para mostrar la cam en la app.
@@ -963,14 +961,18 @@ function escanear() {
                 window.QRScanner.scan(scanCallback);
             }
         );
+    } else {
+        alert("No abre el scanner")
     }
 }
 
 function scanCallback(err, text) {
+    alert("entro a la funcion scarCallback")
     if (err) {
         // Ocurrió un error o el escaneo fue cancelado(error code '6').
         ons.notification.alert(JSON.stringify(err));
     } else {
+        alert("No hay error, voy a llamar a CargarQrPage")
         // Si no hay error escondo el callback y vuelvo a la pantalla anterior pasando el string que se escaneó con la url del producto.
         QRScanner.hide();
         //myNavigator.popPage({ data: { scanText: text } });
@@ -980,6 +982,7 @@ function scanCallback(err, text) {
 
 // Función que carga el home, si hay algo escaneado trae el producto y lo muestra
 function cargarQrPage(pUrl) {
+    alert("llamé a cargarQrPage")
     // Si me pasaron datos por parámetro en la navegación.
     // Hacer this.data es lo mismo que hacer myNavigator.topPage.data
     if (pUrl) {
@@ -994,10 +997,10 @@ function cargarQrPage(pUrl) {
             //complete: despuesCargarQrPage
         });
     }
-}  
+}
 
-function mostrarProductoEscaneado(pResponse){
-$("#divParaScanProducto").html('');
+function mostrarProductoEscaneado(pResponse) {
+    $("#divParaScanProducto").html('');
     ons.notification.toast("success", { timeout: 1500 });
     let r = pResponse.data[0];
     ons.notification.toast(JSON.stringify(r), { timeout: 5000 });
@@ -1013,15 +1016,17 @@ $("#divParaScanProducto").html('');
         <div class="right">
             <span class="list-item__title">$${r.precio}</span>
         </div>
-    </ons-list-item>`; 
-    $('#productos-list').html(unItemList);  
+    </ons-list-item>`;
+    $('#productos-list').html(unItemList);
 }
 
 
-function irAlFalsoScan () {
+
+
+function irAlFalsoScan() {
     myNavigator.pushPage("falsoScan.html");
 }
-function falsoScan() {   
+function falsoScan() {
     //myNavigator.popPage({data: {scanText: 'http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001'}});
     cargarQrPage('http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001');
 }
