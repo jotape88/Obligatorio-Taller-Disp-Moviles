@@ -172,7 +172,7 @@
     <template id="catalogo.html">
         <ons-page>
             <script>
-                ons.getScriptPage().onShow = cargarListadoProductos;
+                ons.getScriptPage().onInit = cargarListadoProductos;
             </script>
             <script>
                 document.addEventListener('init', function (event) {
@@ -418,7 +418,7 @@
         <ons-page id="qrPage">
             <script>
                 // Script para lanzar la función de scanear.
-                ons.getScriptPage().onInit = cargarQrPage;
+                //ons.getScriptPage().onShow = cargarQrPage;
                 // Sobrescribo el back button para esconder el escaner y mandar a la pantalla anterior el valor ''.
                 document.querySelector('ons-back-button').onClick = function(event) {
                     if(window.QRScanner) {
@@ -435,7 +435,9 @@
             </ons-toolbar>
 
             <div>
-                <ons-list id="productos-list"></ons-list>
+                <ons-list id="productos-list">
+                    
+                </ons-list>
             </div>
 
         </ons-page>
@@ -444,6 +446,7 @@
     <template id="falsoScan.html">
         <ons-page id="falsoScan">
             <script>
+                ons.getScriptPage().onShow = cargarQrPage;
                 // Sobrescribo el back button para esconder el escaner y mandar a la pantalla anterior el valor ''.
                 document.querySelector('ons-back-button').onClick = function(event) {
                     if(window.QRScanner) {
@@ -457,10 +460,20 @@
                 </div>
                 <div class="center">Scan</div>
             </ons-toolbar>
-            <p>Simularemos que se escaneó un código QR y que nos devuelve la URL: http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001</p>
-            <ons-button modifier="large" onclick="falsoScan()">
-                Ejecutar falso escaner
-            </ons-button>
+
+
+            <div style="margin: 1% 6%">
+                <p>Simularemos que se escaneó un código QR y que nos devuelve la URL: http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001</p>
+                <ons-button modifier="large" onclick="falsoScan()">
+                    Ejecutar falso escaner
+                </ons-button><br>
+
+                <div>
+                    <ons-list id="productos-list">                  
+                    </ons-list>
+                </div>
+            </div>
+
         </ons-page>
     </template>
 
