@@ -430,17 +430,18 @@ function crearListadoFavoritos() {
                     // y hacer validacion por si el id no existe. (ver de mostrar imagen o cartel que indique que el producto no existe)
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
-                    let unaCard = `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
-                    <ons-list>
-                    <ons-list-item tappable>
-                    <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
-                    <ons-list-item>Precio: $${unFavorito.elProducto.precio}</ons-list-item> 
-                    <ons-list-item>Código: ${unFavorito.elProducto.codigo}</ons-list-item>
-                    <ons-list-item>Etiquetas: ${unFavorito.elProducto.etiquetas}</ons-list-item>
-                    <ons-list-item>Estado: ${unFavorito.elProducto.estado}</ons-list-item>
-                    </ons-list-item>
-                </ons-list>
-                </ons-card>`;
+                    let unaCard =
+                    `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
+                        <ons-list>
+                            <ons-list-item tappable>
+                                <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
+                                <ons-list-item>Precio: $${unFavorito.elProducto.precio}</ons-list-item> 
+                                <ons-list-item>Código: ${unFavorito.elProducto.codigo}</ons-list-item>
+                                <ons-list-item>Etiquetas: ${unFavorito.elProducto.etiquetas}</ons-list-item>
+                                <ons-list-item>Estado: ${unFavorito.elProducto.estado}</ons-list-item>
+                            </ons-list-item>
+                        </ons-list>
+                    </ons-card>`;
                     $("#divFavoritos").append(unaCard);
                 }
             }
@@ -978,30 +979,29 @@ function scanCallback(err, text) {
 }
 
 // Función que carga el home, si hay algo escaneado trae el producto y lo muestra
-function cargarQrPage(text, despuesCargarQrPage) {
+function cargarQrPage(pUrl) {
     // Si me pasaron datos por parámetro en la navegación.
     // Hacer this.data es lo mismo que hacer myNavigator.topPage.data
-    if (text) {
-        ons.notification.alert(text);
+    if (pUrl) {
+        ons.notification.alert(pUrl);
         $.ajax({
             type: "GET",
-            url: text,
+            url: pUrl,
             contentType: "application/json",
             beforeSend: cargarTokenEnRequest,
             success: mostrarProductoEscaneado,
             error: errorCallback,
-            complete: despuesCargarQrPage
+            //complete: despuesCargarQrPage
         });
     }
 }  
 
 function mostrarProductoEscaneado(pResponse){
-    navegar('qrPage', false);
+$("#divParaScanProducto").html('');
     ons.notification.toast("success", { timeout: 1500 });
     let r = pResponse.data[0];
     ons.notification.toast(JSON.stringify(r), { timeout: 5000 });
-    let unaCard =
-    `
+    let unItemList = `
     <ons-list-item>
         <div class="left">
             <img class="list-item__thumbnail" src="http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${r.urlImagen}.jpg">
@@ -1013,9 +1013,8 @@ function mostrarProductoEscaneado(pResponse){
         <div class="right">
             <span class="list-item__title">$${r.precio}</span>
         </div>
-    </ons-list-item>
-    `;
-    $('#productos-list').html(unaCard);
+    </ons-list-item>`; 
+    $('#productos-list').html(unItemList);  
 }
 
 
