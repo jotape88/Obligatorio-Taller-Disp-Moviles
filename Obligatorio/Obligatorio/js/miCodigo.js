@@ -573,15 +573,6 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
         $.ajax({
             type: 'GET',
             url: urlBase + `/productos/${idProd}`,
-
-            /**
-             * El beforeSend lo uso para cargar el token en el header de la petición y
-             * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
-             * ejecutar antes de enviar la petición (beforeSend).
-             * Esto se debe hacer porque el header mediante el que se manda el token
-             * es un header personalizado (usualmente comienzan por x-).
-             */
-
             beforeSend: cargarTokenEnRequest,
             success: verDetalleProducto,
             error: errorCallback,
