@@ -473,7 +473,6 @@ function crearListadoFavoritos() {
             if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
                 for (let j = 0; j < losFavoritos.length; j++) {
-                    //TODO: Cambiar codigo para que busque el prod cada vez que carga el listado de Favoritos
                     // y hacer validacion por si el id no existe. (ver de mostrar imagen o cartel que indique que el producto no existe)
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
@@ -944,7 +943,7 @@ function buscarDireccion(pDireccion, pCiudad, pPais, pNombre) {
 
 
 // Función que se encarga de dibujar un punto en el mapa y agregar una una línea desde la posición del usuario hasta el punto dibujado.
-//TODO: si da tiempo, que se muestre despues del onshow o mostrar un loading
+
 function dibujarDistancia(lat, lon, nombre) {
     // Dibujo el punto en el mapa.
     L.marker([lat, lon]).addTo(miMapa).bindPopup(nombre).openPopup();
@@ -968,6 +967,7 @@ function prepareCallback(err, status) {
         ons.notification.alert(JSON.stringify(err));
     }
     if (status.authorized) {
+        alert('Me autorizaron');
         // Tenemos acceso y el escaner está inicializado.
     } else if (status.denied) {
         // El usuario rechazó el pedido, la pantalla queda en negro.
@@ -985,12 +985,13 @@ function prepareCallback(err, status) {
 // Función que me lleva a la pantalla de escaneo.
 function irAlScan() {
     navegar("qrPage", false);
+    escanear();
 }
 
 // Función que se dispara al ingresar a la página de escaneo.
 function escanear() {
-    alert("entro a la funcion escanear");
     // Si hay scanner
+    console.log(QRScanner.status);
     if (window.QRScanner) {
         // Esto lo uso para mostrar la cam en la app.
         // Por defecto la vista previa queda por encima del body y el html.
@@ -1009,11 +1010,11 @@ function escanear() {
 
 function scanCallback(err, text) {
     alert("entro a la funcion scarCallback");
+
     if (err) {
         // Ocurrió un error o el escaneo fue cancelado(error code '6').
         ons.notification.alert(JSON.stringify(err));
     } else {
-        alert("No hay error, voy a llamar a CargarQrPage");
         // Si no hay error escondo el callback y vuelvo a la pantalla anterior pasando el string que se escaneó con la url del producto.
         QRScanner.hide();
         //myNavigator.popPage({ data: { scanText: text } });
@@ -1023,7 +1024,6 @@ function scanCallback(err, text) {
 
 // Función que carga el home, si hay algo escaneado trae el producto y lo muestra
 function cargarQrPage(pUrl) {
-    alert("llamé a cargarQrPage");
     // Si me pasaron datos por parámetro en la navegación.
     // Hacer this.data es lo mismo que hacer myNavigator.topPage.data
     if (pUrl) {
