@@ -6,7 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Importamos las hojas de estilo y el JavaScript que nos dice la documentación de Onsen UI. -->
     <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
     <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
     <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
@@ -80,11 +79,12 @@
             <div style="text-align: center; margin-top: 30px;">
                 <h1>Login</h1>
                 <p>
+                    <!-- //TODO: Quitar el hardcodeado antes de entregar -->
                     <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" value="fcroce@k12.com" float>
                     </ons-input>
                 </p>
                 <p>
-                    <ons-input id="txtLoginPassword" modifier="underbar" placeholder="Password" value="hola1234" float>
+                    <ons-input type="password" id="txtLoginPassword" modifier="underbar" placeholder="Password" value="hola1234" float>
                     </ons-input>
                 </p>
 

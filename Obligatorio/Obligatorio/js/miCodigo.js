@@ -1,9 +1,9 @@
 /*jshint esversion: 6 */
 
+//#region Inicialización de la app
 /******************************
  * Inicialización
  ******************************/
-
 document.addEventListener("deviceready", onDeviceReady, false);
 ons.ready(todoCargado);
 
@@ -52,7 +52,7 @@ function navegarAtras() {
     cerrarMenu();
 }
 
-
+//Funcion que verifica si hay un usuario logueado y navega a donde corresponda
 function inicializar() {
     // Chequeo si en el localStorage hay token guardado.
     tokenGuardado = window.localStorage.getItem("AppUsuarioToken");
@@ -68,6 +68,8 @@ function inicializar() {
     });
 }
 
+//#endregion
+
 //#region Variables Globales
 /******************************
  * Variables globales
@@ -77,11 +79,13 @@ const urlBase = 'http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/';
 // Sesión
 let usuarioLogueado;
 let tokenGuardado;
-// Productos
+// Productos provenientes de la llamada a la API
 const productos = [];
+// Productos filtrados
 let productosFiltrados = { data: Array(), error: "" };
 //Sucursales
 const lasSucursales = [];
+
 //#endregion
 
 //#region Funcionalidades del sistema
@@ -136,22 +140,22 @@ function chequearSesion(despuesDeChequearSesion) {
 
 }
 
+//Funcion para mostrar el nombre del usuario logueado en la Home
 function mostrarBienvenidaUsuario(){
     $("#pHome").html(`Hola, ${usuarioLogueado.nombre}!`);
 }
 
+
 function cerrarSesion() {
-    // Así remuevo específicamente el token guardado.
-    // window.localStorage.removeItem("AppUsuarioToken");
-    // Así vacío todo lo que haya guardado.
-    window.localStorage.removeItem("AppUsuarioToken", JSON.stringify(tokenGuardado)); // reemplace el .clear xq tambien borra los favoritos al borrar el token
-    //inicializar();
+    //Removemos el token guardado en el localStorage
+    window.localStorage.removeItem("AppUsuarioToken", JSON.stringify(tokenGuardado)); 
+    //Navegamos al login
     navegar('login', true);
 }
 //#endregion
 
 //#region Registro
-/* Registro */
+/* Registro de Usuario Nuevo*/
 function registroRegistrarseHandler() {
     let nombreIngresado = $("#txtRegistroNombre").val();
     let apellidoIngresado = $("#txtRegistroApellido").val();
@@ -166,6 +170,7 @@ function registroRegistrarseHandler() {
                 if (validarNombre(nombreIngresado)) {
                     if (validarApellido(apellidoIngresado)) {
                         if (validarDireccion(direccionIngresada)) {
+                            //Guardamos los datos del usuario en un objeto llamado datosUsuario,m que luego lo pasamos por string a la llamada ajax
                             const datosUsuario = {
                                 nombre: nombreIngresado,
                                 apellido: apellidoIngresado,
@@ -179,7 +184,7 @@ function registroRegistrarseHandler() {
                                 url: urlBase + 'usuarios',
                                 contentType: "application/json",
                                 data: JSON.stringify(datosUsuario),
-                                // Lo que se debe hacer es tan poco, que lo dejo en una función anónima.
+                                // Ya que lo que debemos ejecutar es tan simple, lo hacemos en una funcion anonima.
                                 success: function () {
                                     ons.notification.alert("El usuario ha sido creado correctamente", { title: 'Aviso!' });
                                     navegar('login', true);
@@ -210,7 +215,7 @@ function registroRegistrarseHandler() {
 
 //#region Validaciones
 
-//funcion que valida el mail
+//Funcion que valida el e-mail segun lo solicitado
 function validarCorreo(pCorreo) {
     let esValido = false;
     if (pCorreo.trim().length >= 6) {
@@ -233,23 +238,26 @@ function validarCorreo(pCorreo) {
     return esValido;
 }
 
-//funcion que valida el largo del password
+//Funcion que valida el largo del password
 function validarPassword(pPassword) {
     return pPassword.trim().length >= 8;
 }
 
-//funcion que valida el nombre
+//Funcion que valida el nombre
 function validarNombre(pNombre) {
-    return pNombre.trim().length >= 1;
+    //Si bien no es solicitado, utilizamos un largo minimo superior a un caracter
+    return pNombre.trim().length > 1;
 }
-//funcion que valida el apellido
+//Funcion que valida el apellido
 function validarApellido(pApellido) {
-    return pApellido.trim().length >= 1;
+    //Si bien no es solicitado, utilizamos un largo minimo superior a un caracter
+    return pApellido.trim().length > 1;
 }
-//funcion que valida la direccion
+//Funcion que valida la direccion, debe contener letras y numeros
 function validarDireccion(pDireccion) {
     let esValido = false;
-    if (pDireccion.trim().length >= 1) {
+    //Si bien no es solicitado, utilizamos un largo minimo superior a un caracter
+    if (pDireccion.trim().length > 1) {
         let tieneLetras = false;
         let tieneNumeros = false;
         let i = 0;
@@ -267,12 +275,14 @@ function validarDireccion(pDireccion) {
 }
 //#endregion
 
-//#region  Login
+//#region Login
 /* Login */
+//Funcion que se encarga de hacer la llamada a la API con los datos del login
 function loginIniciarSesionHandler() {
     let emailIngresado = $("#txtLoginEmail").val();
     let passwordIngresado = $("#txtLoginPassword").val();
     const opciones = { title: 'Error' };
+    //Antes de hacer una llamada innecesaria a la api, validamos de nuestro lado los datos ingresados
     if (validarCorreo(emailIngresado)) {
         if (validarPassword(passwordIngresado)) {
             const datosUsuario = {
@@ -289,39 +299,30 @@ function loginIniciarSesionHandler() {
                 error: errorCallback
             });
         } else {
-            mensaje = 'La contraseña debe tener al menos 8 caracteres';
-            ons.notification.alert(mensaje, opciones);
+            ons.notification.alert('La contraseña debe tener al menos 8 caracteres', opciones);
         }
     } else {
-        mensaje = 'El formato del correo no es válido';
-        ons.notification.alert(mensaje, opciones);
+        ons.notification.alert('El formato del correo no es válido', opciones);
     }
 }
 
+//Funcion que crea un nuevo usuario a traves del constructor usando la data recibida luego de que la API devuelva un codigo 200
 function iniciarSesion(dataUsuario) {
     usuarioLogueado = new Usuario(dataUsuario.data._id, dataUsuario.data.nombre, dataUsuario.data.apellido, dataUsuario.data.email, dataUsuario.data.direccion, null);
     tokenGuardado = dataUsuario.data.token;
     localStorage.setItem("AppUsuarioToken", tokenGuardado);
-    //mostrarHome();
-    //mostrarMenuUsuarioAutenticado();
     navegar('home', true, dataUsuario);
 }
 //#endregion
 
-//#region catalogo de productos 
+//#region Catalogo de productos 
 
 /* Catalogo */
+//Llamada a la API para obtener todos los productos existentes en la base de datos
 function cargarListadoProductos(despuesDeCargarListadoProductos) {
     $.ajax({
         type: 'GET',
         url: urlBase + 'productos',
-        /**
-         * El beforeSend lo uso para cargar el token en el header de la petición y
-         * lo hago mediente la función cargarTokenEnRequest. Esta función se va a
-         * ejecutar antes de enviar la petición (beforeSend).
-         * Esto se debe hacer porque el header mediante el que se manda el token
-         * es un header personalizado (usualmente comienzan por x-).
-         */
         beforeSend: cargarTokenEnRequest,
         success: crearListadoProductos,
         error: errorCallback,
@@ -331,10 +332,7 @@ function cargarListadoProductos(despuesDeCargarListadoProductos) {
 //#endregion
 
 //#region Filto de productos
-
-//Filtrar productos
-
-//Función que hace un llamado a la Api 
+//Función que hace un llamado a la API y filtra los productos segun un string que toma desde el HTML ingresado por el usuario
 function filtrarProductos(despuesDeCargarListadoProductos) {
     $("#divProductosCatalogo").html("");
     let texto = $("#txtFiltroProductos").val();
@@ -345,22 +343,24 @@ function filtrarProductos(despuesDeCargarListadoProductos) {
             nombre: texto
         },
         beforeSend: cargarTokenEnRequest,
-        //success: buscarNombreOEti,
-        success: guardarProductosFiltradosEnVariable,
+        success: guardarProductosFiltrados,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
     });
 }
 
-function guardarProductosFiltradosEnVariable(datos) {
+//Funcion que guarda los productos filtrados por nombre en una variable
+function guardarProductosFiltrados(datos) {
+    //Utilizamos un objeto con el mismo formato que maneja la API (.data) para los productos, para que la funcion que genera el listado de productos no nos devuelva error
     productosFiltrados = { data: Array(), error: "" };
-    const losProductos = datos.data
+    //Nos posicionamos dentro de la clave data de los productos que recibimos desde la API
+    const losProductos = datos.data;
     let textoIngresado = $("#txtFiltroProductos").val();
-
     if (datos && losProductos.length > 0) {
         for (let i = 0; i < losProductos.length; i++) {
             let unProducto = losProductos[i];
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
+            //Guardamos y pusheamos todos los productos filtrados que nos mande la API en la variable global productosFiltrados
             productosFiltrados.data.push(prodX);
         }
     }
@@ -373,10 +373,10 @@ function guardarProductosFiltradosEnVariable(datos) {
             let encontrado = false;
             while (!encontrado && x < lasEtiquetas.length) {
                 let etiquetaX = lasEtiquetas[x];
-                if (etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
-                    //fijarse si el producto ya esta en productosFiltrados
-                    let j = 0
-                    let existeElProdFiltrado = false
+                //Verificamos que el texto ingresado por el usuario sea subcadena de una etiqueta de un objeto
+                if (etiquetaX.includes(textoIngresado)) {
+                    let j = 0;
+                    let existeElProdFiltrado = false;
                     while (!existeElProdFiltrado && j < productosFiltrados.data.length) {
                         let unProdFiltrado = productosFiltrados.data[j];
                         if (unProd.nombre == unProdFiltrado.nombre) {
@@ -392,9 +392,7 @@ function guardarProductosFiltradosEnVariable(datos) {
             }
         }
     }
-    console.log(datos);
-    console.log(productosFiltrados);
-
+    //Llamamos a la funcion de Crear listado de productos, y le pasamos el Objeto con los productos filtrados
     crearListadoProductos(productosFiltrados);
 }
 
@@ -409,6 +407,7 @@ function buscarNombreOEti(pData) {
     }
 }
 
+//Funcion para filtrar los productos segun su etiqueta
 function filtrarProductosXEtiqueta() {
     let textoIngresado = $("#txtFiltroProductos").val();
     textoIngresado = textoIngresado.toLowerCase();
@@ -420,8 +419,7 @@ function filtrarProductosXEtiqueta() {
         let encontrado = false;
         while (!encontrado && x < unaEtiqueta.length) {
             let etiquetaX = unaEtiqueta[x];
-            //if(esSubcadena(etiquetaX, textoIngresado)) {
-            if (etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
+            if (etiquetaX.includes(textoIngresado)) {
                 arrayFiltrados.data.push(unProd);
                 encontrado = true;
             }
@@ -430,13 +428,14 @@ function filtrarProductosXEtiqueta() {
     }
     crearListadoProductos(arrayFiltrados);
 }
+//#endregion
 
-
-
-
+//#region Listados
+//Funcion principal para generar los listados de productos
 function crearListadoProductos(dataProductos) {
-
-    $("#divProductosCatalogo").html(""); //Limpiamos el catalogo para filtrar por etiquetas
+    //Limpiamos el div catalogo para filtrar por etiquetas correctamente
+    $("#divProductosCatalogo").html(""); 
+    //Vaciamos la constante productos
     productos.splice(0, productos.length);
     if (dataProductos && dataProductos.data.length > 0) {
         for (let i = 0; i < dataProductos.data.length; i++) {
@@ -456,18 +455,15 @@ function crearListadoProductos(dataProductos) {
                 </ons-list>
                 <ons-button style="margin-bottom: -14px;" modifier="large" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
                 </ons-card>`;
-
-
             $("#divProductosCatalogo").append(unaCard);
-
         }
-
-
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
 }
 
+//Funcion para mostrar el listado de favoritos el cual obtiene del localStorage
 function crearListadoFavoritos() {
+    //Vaciamos el div favoritos
     $("#divFavoritos").html("");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
@@ -501,6 +497,7 @@ function crearListadoFavoritos() {
     }
 }
 
+//Funcion para eliminar los favoritos, se encarga de eliminar los favoritos del localStorage, una vez eliminado, se vuelve a convertir en string y se vuelve a guardar sobreescribiendo los valores anteriores
 function eliminarFavoritos() {
     let favoritoId = $(this).attr("myAttr2");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
@@ -524,9 +521,8 @@ function eliminarFavoritos() {
     crearListadoFavoritos();
 }
 
-
+//Funcion vinculada al boton de eliminar y agregar favoritos, elimina o agrega un favorito segun corresponda
 function btnProductoFavoritoHandler() {
-
     let productoId = $(this).attr("myAttr");
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
@@ -572,7 +568,10 @@ function btnProductoFavoritoHandler() {
     window.localStorage.setItem("AppProductosFavoritos", JSON.stringify(usuariosFavsJSON));
 }
 
+//#endregion
 
+//#region Metodos
+//Funcion para verificar si existe el usuario en el localStorage segun el email
 function existeUsuario(pEmail) {
     let existe = false;
     let i = 0;
@@ -591,7 +590,7 @@ function existeUsuario(pEmail) {
     return existe;
 }
 
-//Obtengo el objeto producto a traves del Id
+//Funcion para obtener el objeto producto a traves del Id en la constante global productos
 function obtenerProductoPorID(idProducto) {
     let producto = null;
     let i = 0;
@@ -608,19 +607,19 @@ function obtenerProductoPorID(idProducto) {
 function pasarAString(unJson) {
     unJson = Object.values(unJson);
     let palabraFinal = "";
-
     for (let i = 0; i < unJson.length; i++) {
         palabraFinal += unJson[i];
     }
     return palabraFinal;
 }
 
+//#endregion
 
+//#region Detalle y compra de Productos
+//Llamada a la API que nos devuelve el datalle de un solo producto
 function cargarDetalleProducto(despuesDeCargarElProducto) {
-
     let idProd = myNavigator.topPage.data;
     idProd = pasarAString(idProd);
-
     if (idProd) {
         $.ajax({
             type: 'GET',
@@ -641,12 +640,11 @@ function cargarDetalleProducto(despuesDeCargarElProducto) {
     }
 }
 
+//Funcion que nos muestra el detalle del producto que obtiene de la llamada a la API
 function verDetalleProducto(dataProducto) {
-
     const miProducto = dataProducto.data;
     //Creo una constante para capturar la URL de la imagen
     const unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${miProducto.urlImagen}.jpg`;
-
     let unaCard = `<ons-card><div class="title">${miProducto.nombre}</div>
         <ons-list>
             <ons-list-item tappable>
@@ -676,6 +674,7 @@ function verDetalleProducto(dataProducto) {
     cargarSucursales();
 }
 
+//Llamada a la API para obtener el listado de sucursales
 function cargarSucursales(despuesDeCargarSucursales) {
     $.ajax({
         type: 'GET',
@@ -687,6 +686,7 @@ function cargarSucursales(despuesDeCargarSucursales) {
     });
 }
 
+//Funcion para cargar un combo dinamico en el DOM utilizando los valores provenientes de la llamada a la API
 function crearCombo(pData) {
     let sucursales = pData.data;
     let elCombo = `<option value=-1>Seleccione una sucursal</option>`;
@@ -699,20 +699,17 @@ function crearCombo(pData) {
     $("#selectSucursales").html(elCombo);
 }
 
-
 function cargarDatosCompra() {
     mostrarDatosCompra();
 
 }
 
-
+//Funcion encargada de manejar la compra de productos a traves de un llamado a la API con metodo POST
 function comprarProducto(idProd, despuesdeComprarProducto) {
-
     //Capturo la cantidad comprada desde el input
     const cantidad = $(`#inputProd`).val();
     const sucursal = $(`#selectSucursales`).val();
     //Si la cantidad es válida, creo el objeto para el llamado a la API
-
     if (sucursal !== null && sucursal != -1) {
         if (cantidad && cantidad > 0) {
             const data = {
@@ -740,16 +737,14 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
             ons.notification.alert(mensaje, opciones);
         }
     } else {
-        ons.notification.alert("Seleccione una sucursal", { title: "Error" })
+        ons.notification.alert("Seleccione una sucursal", { title: "Error" });
     }
 }
 
-
+//Funcion para mostrar el detalle de la compra recien realizada
 function mostrarDatosCompra() {
     //Tomo los datos que pasé en la funcion navegar
-    //const unaCompra = myNavigator.topPage.data;
     const unaCompra = this.data;
-
     if (unaCompra) {
         const idProd = unaCompra.idProducto;
         const productoComprado = obtenerProductoPorID(idProd);
@@ -765,25 +760,23 @@ function mostrarDatosCompra() {
     }
 }
 
-//Hago el llamado a la API para mostrar todos los pedidos de un usuario
+//Funcion que efectua el llamado a la API para mostrar todos los pedidos de un usuario
 function cargarDetallePedidos(despuesDeCargarPedidos) {
-
     $.ajax({
         type: 'GET',
         url: urlBase + 'pedidos',
         contentType: "application/json",
-
         beforeSend: cargarTokenEnRequest,
         success: mostrarPedidos,
         error: errorCallback,
         complete: despuesDeCargarPedidos
     });
-
 }
 
+//Funcion que genera un listado de los pedidos realizado por el usuario
 function mostrarPedidos(pedidos) {
-    //si hay algun pedido
     const miPedido = pedidos.data;
+    //si hay algun pedido
     if (miPedido.length > 0) {
         //Recorro el array de pedidos y voy cargando la info
         for (let i = 0; i < miPedido.length; i++) {
@@ -823,35 +816,33 @@ function mostrarPedidos(pedidos) {
 //Funcion que agrega el comentario
 function agregarComentario(idPedido, miComentario) {
     console.log('idPedido: ' + idPedido);
-
     const elComentario = {
         comentario: miComentario
-    }
+    };  
 
     $.ajax({
         type: 'PUT',
         url: urlBase + `pedidos/${idPedido}`,
         contentType: "application/json",
         data: JSON.stringify(elComentario),
-
         beforeSend: cargarTokenEnRequest,
         success: navegar('catalogo', false),
         error: errorCallback
     });
-
-
 }
 
+//#endregion
+
+//#region Funciones Generales
 //Funcion que muestra el Dialog para agregar comentario al pedido
 function showPrompt(idPedido) {
     ons.notification.prompt('Ingrese un comentario')
         .then(function (input) {
-            agregarComentario(idPedido, input)
+            agregarComentario(idPedido, input);
             var message = input ? 'Gracias por su comentario' : 'El comentario no puede estar vacio';
             ons.notification.alert(message);
         });
 }
-
 
 /* Generales */
 function errorCallback(error) {
@@ -861,17 +852,17 @@ function errorCallback(error) {
 
 // Función para cerrar el menú.
 function cerrarMenu() {
-    // No puedo seleccionar el elemento con $("#menu") porque la función .close() no es de jQuery.
+    // No puedo seleccionar el elemento con $("#menu") porque la función .close() no es de jQuery, por lo tanto usamos JS nativo
     document.querySelector("#menu").close();
 }
+//#endregion
 
+//#region Mapa
 
-
-
-//EL CODIGO DEL MAPA
 let posicionDelUsuario;
 let miMapa;
 
+//Funcion que se encarga de obtener las cordenadas del usuario
 function cargarPosicionDelUsuario() {
     window.navigator.geolocation.getCurrentPosition(
         // Callback de éxito.
@@ -879,7 +870,7 @@ function cargarPosicionDelUsuario() {
             posicionDelUsuario = {
                 latitude: pos.coords.latitude,
                 longitude: pos.coords.longitude
-            }
+            };
             inicializarMapa();
         },
         // Calback de error.
@@ -893,12 +884,12 @@ function cargarPosicionDelUsuario() {
     );
 }
 
+//Inicializamos el Mapa
 function inicializarMapa() {
     // Guardo referencia global a mi mapa.
     miMapa = L.map("contenedorDeMapa").setView([posicionDelUsuario.latitude, posicionDelUsuario.longitude], 13);
     // Vacío el mapa.
     miMapa.eachLayer(m => m.remove());
-
     // Dibujo la cartografía base.
     L.tileLayer(
         "https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWNhaWFmYSIsImEiOiJjanh4cThybXgwMjl6M2RvemNjNjI1MDJ5In0.BKUxkp2V210uiAM4Pd2YWw",
@@ -912,11 +903,13 @@ function inicializarMapa() {
     encontrarSucursales();
 }
 
+//Dibujamos con un marcador en el mapa la posicion actual del usuario
 function dibujarPosicionDelUsuarioHandler() {
     L.marker([posicionDelUsuario.latitude, posicionDelUsuario.longitude]).addTo(miMapa).bindPopup('Mi Ubicación').openPopup();
     miMapa.panTo(new L.LatLng(posicionDelUsuario.latitude, posicionDelUsuario.longitude));
 }
 
+//Recorremos las sucursales y llamamos a la API con las direcciones que obtenemos
 function encontrarSucursales() {
     for (let i = 0; i < lasSucursales.length; i++) {
         let unaSucu = lasSucursales[i];
@@ -935,8 +928,6 @@ function buscarDireccion(pDireccion, pCiudad, pPais, pNombre) {
         contentType: "application/json",
         success: function (data) {
             if (data.length > 0) {
-                // L.marker([data[0].lat, data[0].lon]).addTo(miMapa).bindPopup(direccionBuscada);
-                // miMapa.panTo(new L.LatLng(data[0].lat, data[0].lon));
                 dibujarDistancia(data[0].lat, data[0].lon, pNombre);
             } else {
                 alert("No se han encontrado datos");
@@ -962,7 +953,7 @@ function dibujarDistancia(lat, lon, nombre) {
     // Calculo la distancia usando la librería. Divido entre 1000 para obtener los km y me quedo con 2 decimales.
     const distancia = Number(miMapa.distance([posicionDelUsuario.latitude, posicionDelUsuario.longitude], [lat, lon]) / 1000).toFixed(2);
     // Dibujo una línea amarilla con un pop up mostrando la distancia.
-    const polyline = L.polyline(puntosLinea, { color: 'yellow' }).addTo(miMapa).bindPopup(`Distancia ${distancia} km.`).openPopup();;
+    const polyline = L.polyline(puntosLinea, { color: 'yellow' }).addTo(miMapa).bindPopup(`Distancia ${distancia} km.`).openPopup();
     // Centro el mapa en la línea.
     miMapa.fitBounds(polyline.getBounds());
 }
@@ -985,6 +976,9 @@ function prepareCallback(err, status) {
     }
 }
 
+//#endregion
+
+//#region Escaneo QR
 // Función que me lleva a la pantalla de escaneo.
 function irAlScan() {
     navegar("qrPage", false);
@@ -992,7 +986,7 @@ function irAlScan() {
 
 // Función que se dispara al ingresar a la página de escaneo.
 function escanear() {
-    alert("entro a la funcion escanear")
+    alert("entro a la funcion escanear");
     // Si hay scanner
     if (window.QRScanner) {
         // Esto lo uso para mostrar la cam en la app.
@@ -1006,17 +1000,17 @@ function escanear() {
             }
         );
     } else {
-        alert("No abre el scanner")
+        alert("No abre el scanner");
     }
 }
 
 function scanCallback(err, text) {
-    alert("entro a la funcion scarCallback")
+    alert("entro a la funcion scarCallback");
     if (err) {
         // Ocurrió un error o el escaneo fue cancelado(error code '6').
         ons.notification.alert(JSON.stringify(err));
     } else {
-        alert("No hay error, voy a llamar a CargarQrPage")
+        alert("No hay error, voy a llamar a CargarQrPage");
         // Si no hay error escondo el callback y vuelvo a la pantalla anterior pasando el string que se escaneó con la url del producto.
         QRScanner.hide();
         //myNavigator.popPage({ data: { scanText: text } });
@@ -1026,7 +1020,7 @@ function scanCallback(err, text) {
 
 // Función que carga el home, si hay algo escaneado trae el producto y lo muestra
 function cargarQrPage(pUrl) {
-    alert("llamé a cargarQrPage")
+    alert("llamé a cargarQrPage");
     // Si me pasaron datos por parámetro en la navegación.
     // Hacer this.data es lo mismo que hacer myNavigator.topPage.data
     if (pUrl) {
@@ -1043,6 +1037,7 @@ function cargarQrPage(pUrl) {
     }
 }
 
+//Funcion que nos muestra un list item con el producto escaneado
 function mostrarProductoEscaneado(pResponse) {
     $("#divParaScanProducto").html('');
     ons.notification.toast("success", { timeout: 1500 });
@@ -1064,13 +1059,10 @@ function mostrarProductoEscaneado(pResponse) {
     $('#productos-list').html(unItemList);
 }
 
-
-
-
 function irAlFalsoScan() {
     myNavigator.pushPage("falsoScan.html");
 }
 function falsoScan() {
-    //myNavigator.popPage({data: {scanText: 'http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001'}});
     cargarQrPage('http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001');
 }
+//#endregion
