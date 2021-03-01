@@ -15,6 +15,8 @@
     <script type="text/javascript" src="js/clases.js"></script>
     <script type="text/javascript" src="js/miCodigo.js"></script>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
         integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
         crossorigin="" />
@@ -64,7 +66,7 @@
         <ons-page>
             <ons-toolbar>
 
-                <div class="left">
+                <div class="center">
                     <ons-toolbar-button id="btnMenuLogin" onclick="navegar('login', true)">
                         Ingresar
                     </ons-toolbar-button>
@@ -150,8 +152,11 @@
 
     <template id="home.html">
         <ons-page>
+            <script>
+                ons.getScriptPage().onShow = mostrarBienvenidaUsuario;
+            </script>
             <!-- El toolbar coloca en la parte superior una barra donde puedo poner botones, textos, íconos, etc. -->
-            <ons-toolbar>
+            <ons-toolbar class="onsToolbar">
                 <div class="left">
                     <ons-toolbar-button onclick="abrirMenu()">
                         <ons-icon icon="md-menu"></ons-icon>
@@ -166,11 +171,12 @@
                     </ons-toolbar-button>
                 </div>
             </ons-toolbar>
-            <ons-card>
-                <img src="https://cdn.webshopapp.com/shops/251281/files/208187906/muddaritaville-mu-welcome-small.jpg"
-                    alt="Welcome!" style="width: 100% ">
 
-            </ons-card>
+            <div class="title" id="divHome">
+                <p id="pHome"></p>
+                <img src="http://assets.stickpng.com/images/5a62108beace967f8e026a27.png"
+                    alt="Welcome!" style="width: 50% ">
+            </div>
 
         </ons-page>
     </template>
@@ -199,7 +205,7 @@
                 <div class="center">
                     Catalogo de productos
                 </div>
-                
+
                 <div class="right">
                     <ons-toolbar-button onclick="navegarAtras()">
                         Atras
@@ -210,10 +216,17 @@
 
                 </div>
             </ons-toolbar>
-            <div>
+            <div class="col-12">
 
+                <!--Si queremos que funcione con el onKeyUp-->
+                <!--  <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..." value=""  onkeyup=filtrarProductos() float></ons-search-input>-->
+
+                <!--Si queremos que filtre por nombre y por etiquetas-->
                 <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..."
-                    value="" onkeyup=filtrarProductos() float></ons-search-input>
+                    value="" float></ons-search-input>
+                <ons-button onclick="filtrarProductos()">Filtrar</ons-button>
+
+
 
                 <!-- //TODO: Arreglar posicion del boton -->
                 <ons-toolbar-button onclick="escanear()">
@@ -271,11 +284,15 @@
     <template id="detalleProducto.html">
         <ons-page>
             <script>
+                ons.getScriptPage().onShow = cargarDetalleProducto;
+            </script>
+
+            <!-- <script>
                 ons.getScriptPage().onShow = function () {
                     cargarDetalleProducto();
                     cargarSucursales();
                 };
-            </script>
+            </script> -->
             <script>
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {

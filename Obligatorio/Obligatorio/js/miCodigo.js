@@ -79,6 +79,7 @@ let usuarioLogueado;
 let tokenGuardado;
 // Productos
 const productos = [];
+let productosFiltrados = { data: Array(), error: "" };
 //Sucursales
 const lasSucursales = [];
 //#endregion
@@ -133,6 +134,10 @@ function chequearSesion(despuesDeChequearSesion) {
         despuesDeChequearSesion();
     }
 
+}
+
+function mostrarBienvenidaUsuario(){
+    $("#pHome").html(`Hola, ${usuarioLogueado.nombre}!`);
 }
 
 function cerrarSesion() {
@@ -340,10 +345,57 @@ function filtrarProductos(despuesDeCargarListadoProductos) {
             nombre: texto
         },
         beforeSend: cargarTokenEnRequest,
-        success: buscarNombreOEti,
+        //success: buscarNombreOEti,
+        success: guardarProductosFiltradosEnVariable,
         error: errorCallback,
         complete: despuesDeCargarListadoProductos
     });
+}
+
+function guardarProductosFiltradosEnVariable(datos) {
+    productosFiltrados = { data: Array(), error: "" };
+    const losProductos = datos.data
+    let textoIngresado = $("#txtFiltroProductos").val();
+
+    if (datos && losProductos.length > 0) {
+        for (let i = 0; i < losProductos.length; i++) {
+            let unProducto = losProductos[i];
+            let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
+            productosFiltrados.data.push(prodX);
+        }
+    }
+    if (textoIngresado != "") {
+        textoIngresado = textoIngresado.toLowerCase();
+        for (let i = 0; i < productos.length; i++) {
+            let unProd = productos[i];
+            let lasEtiquetas = unProd.etiquetas;
+            let x = 0;
+            let encontrado = false;
+            while (!encontrado && x < lasEtiquetas.length) {
+                let etiquetaX = lasEtiquetas[x];
+                if (etiquetaX.includes(textoIngresado)) { //Este metodo hace lo mismo que esSubadena en una sola linea
+                    //fijarse si el producto ya esta en productosFiltrados
+                    let j = 0
+                    let existeElProdFiltrado = false
+                    while (!existeElProdFiltrado && j < productosFiltrados.data.length) {
+                        let unProdFiltrado = productosFiltrados.data[j];
+                        if (unProd.nombre == unProdFiltrado.nombre) {
+                            existeElProdFiltrado = true;
+                        }
+                        j++;
+                    }
+                    if (!existeElProdFiltrado) {
+                        productosFiltrados.data.push(unProd);
+                    }
+                }
+                x++;
+            }
+        }
+    }
+    console.log(datos);
+    console.log(productosFiltrados);
+
+    crearListadoProductos(productosFiltrados);
 }
 
 //SI el resultado del llamado a la API es success:
@@ -351,14 +403,13 @@ function buscarNombreOEti(pData) {
     //Si hay productos con ese nombre, los trae
     if (pData.data.length > 0) {
         crearListadoProductos(pData);
-    //Si no encontró por nombre, busca por etiquetas
+        //Si no encontró por nombre, busca por etiquetas
     } else {
         filtrarProductosXEtiqueta();
     }
 }
 
 function filtrarProductosXEtiqueta() {
-    //let textoIngresado = $("#txtFiltroProductosEtiqueta").val();
     let textoIngresado = $("#txtFiltroProductos").val();
     textoIngresado = textoIngresado.toLowerCase();
     let arrayFiltrados = { data: Array(), error: "" };
@@ -384,6 +435,7 @@ function filtrarProductosXEtiqueta() {
 
 
 function crearListadoProductos(dataProductos) {
+
     $("#divProductosCatalogo").html(""); //Limpiamos el catalogo para filtrar por etiquetas
     productos.splice(0, productos.length);
     if (dataProductos && dataProductos.data.length > 0) {
@@ -410,7 +462,7 @@ function crearListadoProductos(dataProductos) {
 
         }
 
-        
+
         $(".filaLista").click(btnProductoFavoritoHandler);
     }
 }
@@ -621,6 +673,7 @@ function verDetalleProducto(dataProducto) {
         </ons-card>`;
     }
     $("#divDetalleProductos").html(unaCard);
+    cargarSucursales();
 }
 
 function cargarSucursales(despuesDeCargarSucursales) {
@@ -860,7 +913,7 @@ function inicializarMapa() {
 }
 
 function dibujarPosicionDelUsuarioHandler() {
-    L.marker([posicionDelUsuario.latitude, posicionDelUsuario.longitude]).addTo(miMapa).bindPopup('Ubicación del usuario').openPopup();
+    L.marker([posicionDelUsuario.latitude, posicionDelUsuario.longitude]).addTo(miMapa).bindPopup('Mi Ubicación').openPopup();
     miMapa.panTo(new L.LatLng(posicionDelUsuario.latitude, posicionDelUsuario.longitude));
 }
 

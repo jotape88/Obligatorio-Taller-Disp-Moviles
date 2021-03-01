@@ -7,3 +7,12 @@
     background-color: transparent !important;
     
 }
+
+#divHome{
+    text-align: center;
+}
+
+#pHome{
+    font-family: 'Dancing Script', cursive;
+    font-size: 50px;
+}
