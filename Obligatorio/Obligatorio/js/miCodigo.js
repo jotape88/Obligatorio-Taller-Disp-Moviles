@@ -141,14 +141,14 @@ function chequearSesion(despuesDeChequearSesion) {
 }
 
 //Funcion para mostrar el nombre del usuario logueado en la Home
-function mostrarBienvenidaUsuario(){
+function mostrarBienvenidaUsuario() {
     $("#pHome").html(`Hola, ${usuarioLogueado.nombre}!`);
 }
 
 
 function cerrarSesion() {
     //Removemos el token guardado en el localStorage
-    window.localStorage.removeItem("AppUsuarioToken", JSON.stringify(tokenGuardado)); 
+    window.localStorage.removeItem("AppUsuarioToken", JSON.stringify(tokenGuardado));
     //Navegamos al login
     navegar('login', true);
 }
@@ -296,7 +296,7 @@ function loginIniciarSesionHandler() {
                 contentType: "application/json",
                 data: JSON.stringify(datosUsuario),
                 success: iniciarSesion,
-                error: errorCallback
+                error: errorCallbackLogin
             });
         } else {
             ons.notification.alert('La contraseña debe tener al menos 8 caracteres', opciones);
@@ -434,7 +434,7 @@ function filtrarProductosXEtiqueta() {
 //Funcion principal para generar los listados de productos
 function crearListadoProductos(dataProductos) {
     //Limpiamos el div catalogo para filtrar por etiquetas correctamente
-    $("#divProductosCatalogo").html(""); 
+    $("#divProductosCatalogo").html("");
     //Vaciamos la constante productos
     productos.splice(0, productos.length);
     if (dataProductos && dataProductos.data.length > 0) {
@@ -661,13 +661,13 @@ function verDetalleProducto(dataProducto) {
     if (miProducto.estado == "en stock") {
         unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input><br>
         <select id="selectSucursales"></select><br>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='comprarProducto("${miProducto._id}")'>Comprar</ons-button>
         <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='navegar("mapa", false)'>Ver mapa</ons-button>
+        <ons-button style="" margin-bottom: -14px;" modifier="large" onclick='comprarProducto("${miProducto._id}")'><ons-icon icon="fa-shopping-cart"></ons-icon> Comprar</ons-button>
         </ons-card>`;
         //Si no hay stock, deshabilito el boton
     } else {
         unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" disabled="true" float></ons-input>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
+        <ons-button style="" margin-bottom: -14px;" modifier="large" onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
         </ons-card>`;
     }
     $("#divDetalleProductos").html(unaCard);
@@ -818,7 +818,7 @@ function agregarComentario(idPedido, miComentario) {
     console.log('idPedido: ' + idPedido);
     const elComentario = {
         comentario: miComentario
-    };  
+    };
 
     $.ajax({
         type: 'PUT',
@@ -850,6 +850,9 @@ function errorCallback(error) {
     console.error(error);
 }
 
+function errorCallbackLogin(err) {
+    ons.notification.alert(err.responseJSON.error, { title: 'Error!' });
+}
 // Función para cerrar el menú.
 function cerrarMenu() {
     // No puedo seleccionar el elemento con $("#menu") porque la función .close() no es de jQuery, por lo tanto usamos JS nativo
