@@ -40,7 +40,6 @@ function navegar(paginaDestino, resetStack, datos) {
     if (resetStack) {
         myNavigator.resetToPage(`${paginaDestino}.html`);
     } else {
-        // myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
         myNavigator.bringPageTop(`${paginaDestino}.html`, { data: datos });
     }
     cerrarMenu();
@@ -61,7 +60,6 @@ function inicializar() {
         // Muestro lo que corresponda en base a si hay o no usuario logueado.
         if (!usuarioLogueado) {
             navegar('login', true);
-            //mostrarMenuInvitado();
         } else {
             navegar('home', false);
         }
@@ -700,7 +698,6 @@ function crearCombo(pData) {
 
 function cargarDatosCompra() {
     mostrarDatosCompra();
-
 }
 
 //Funcion encargada de manejar la compra de productos a traves de un llamado a la API con metodo POST
@@ -875,7 +872,7 @@ function cargarPosicionDelUsuario() {
             };
             inicializarMapa();
         },
-        // Calback de error.
+        // Callback de error.
         function () {
             posicionDelUsuario = {
                 latitude: -34.903816878014354,
@@ -1062,10 +1059,4 @@ function mostrarProductoEscaneado(pResponse) {
     $('#productos-list').html(unItemList);
 }
 
-function irAlFalsoScan() {
-    myNavigator.pushPage("falsoScan.html");
-}
-function falsoScan() {
-    cargarQrPage('http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001');
-}
 //#endregion
