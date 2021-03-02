@@ -988,7 +988,6 @@ function prepareCallback(err, status) {
         ons.notification.alert(JSON.stringify(err));
     }
     if (status.authorized) {
-        alert('Me autorizaron');
         // Tenemos acceso y el escaner está inicializado.
     } else if (status.denied) {
         // El usuario rechazó el pedido, la pantalla queda en negro.
