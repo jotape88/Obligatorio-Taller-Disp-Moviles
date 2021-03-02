@@ -468,15 +468,23 @@ function crearListadoProductos(dataProductos) {
 function crearListadoFavoritos() {
     //Vaciamos el div favoritos
     $("#divFavoritos").html("");
+    $("#divNoHayFavoritos").html("");
+    
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
+    //Me fijo si hay algo en el localStorage
     if (usuariosFavsJSON && usuariosFavsJSON.length > 0) {
         for (let i = 0; i < usuariosFavsJSON.length; i++) {
             let unFavJson = usuariosFavsJSON[i];
+            //Si existe el usuario logueado en el localStorage:
             if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
+                //Si existe el usuario, pero no tiene favoritos guardados, muestro un cartel y navego hacia atras(este caso se da cuando el usuario elimina los favoritos guardados)
+                if (losFavoritos.length == 0) {
+                    $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
+                }
+                //Si hay favoritos guardados en el localStorgae, los recorro y los voy mostrando
                 for (let j = 0; j < losFavoritos.length; j++) {
-                    // y hacer validacion por si el id no existe. (ver de mostrar imagen o cartel que indique que el producto no existe)
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
                     let unaCard =
@@ -497,14 +505,18 @@ function crearListadoFavoritos() {
                     </ons-card>`;
                     $("#divFavoritos").append(unaCard);
                 }
-            }else{ 
-                ons.notification.alert('No hay favoritos para mostrar', {title: 'Ups!'})
-                navegarAtras();
-        
+            //Si el usuario logueado no existe en el localStorage (Nunca guaró un favorito)
+            } else {
+                $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
             }
         }
         $(".filaFavs").click(eliminarFavoritos);
+        //Si no existe o no hay nada en el localStorage
+    } else {
+        $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
     }
+
+
 }
 
 //Funcion para eliminar los favoritos, se encarga de eliminar los favoritos del localStorage, una vez eliminado, se vuelve a convertir en string y se vuelve a guardar sobreescribiendo los valores anteriores
@@ -748,7 +760,7 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
                 title: 'Error'
             };
             //Si la cantidad no es válida, muestro mensaje de error
-            mensaje = 'Debe seleccionar la cantidad a comprar';
+            mensaje = 'La cantidad no es válida';
             ons.notification.alert(mensaje, opciones);
         }
     } else {
@@ -988,6 +1000,7 @@ function prepareCallback(err, status) {
         ons.notification.alert(JSON.stringify(err));
     }
     if (status.authorized) {
+
         // Tenemos acceso y el escaner está inicializado.
     } else if (status.denied) {
         // El usuario rechazó el pedido, la pantalla queda en negro.
@@ -1023,14 +1036,10 @@ function escanear() {
                 window.QRScanner.scan(scanCallback);
             }
         );
-    } else {
-        alert("No abre el scanner");
     }
 }
 
 function scanCallback(err, text) {
-    alert("entro a la funcion scarCallback");
-
     if (err) {
         // Ocurrió un error o el escaneo fue cancelado(error code '6').
         ons.notification.alert(JSON.stringify(err));
