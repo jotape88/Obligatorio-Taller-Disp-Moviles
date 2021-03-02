@@ -441,17 +441,22 @@ function crearListadoProductos(dataProductos) {
             let prodX = new Producto(unProducto._id, unProducto.codigo, unProducto.nombre, unProducto.precio, unProducto.urlImagen, unProducto.estado, unProducto.etiquetas);
             productos.push(prodX);
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unProducto.urlImagen}.jpg`;
-            let unaCard = `<ons-card><div class="title">${unProducto.nombre}</div><div>     <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
+            let unaCard = `<ons-card  modifier="material">
+            <div class="title" style="text-align: center">${unProducto.nombre}</div>
+            <div>     
                 <ons-list>
                     <ons-list-item tappable>
-                    <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
-                    <ons-list-item>Precio: $${unProducto.precio}</ons-list-item> 
-                    <ons-list-item>Código: ${unProducto.codigo}</ons-list-item>
-                    <ons-list-item>Etiquetas: ${unProducto.etiquetas}</ons-list-item>
-                    <ons-list-item>Estado: ${unProducto.estado}</ons-list-item>
+                    <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 60%; display:block; margin:auto"></ons-list-item>
+                    <ons-list-item><strong>Precio:&nbsp;</strong> $${unProducto.precio}</ons-list-item> 
+                    <ons-list-item><strong>Código:&nbsp;</strong> ${unProducto.codigo}</ons-list-item>
+                    <ons-list-item><strong>Etiquetas:&nbsp;</strong> ${unProducto.etiquetas}</ons-list-item>
+                    <ons-list-item><strong>Estado:&nbsp;</strong> ${unProducto.estado}</ons-list-item>
                     </ons-list-item>
                 </ons-list>
-                <ons-button style="margin-bottom: -14px;" modifier="large" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
+                <p style="text-align:center">
+                <ons-button modifier="material" onclick="navegar('detalleProducto', false, '${unProducto._id}')">Ver producto</ons-button>
+                <ons-button class="filaLista" myAttr="${unProducto._id}" modifier="material"><i class="fas fa-heart"></i></ons-button> </div>
+                </p>
                 </ons-card>`;
             $("#divProductosCatalogo").append(unaCard);
         }
@@ -463,35 +468,55 @@ function crearListadoProductos(dataProductos) {
 function crearListadoFavoritos() {
     //Vaciamos el div favoritos
     $("#divFavoritos").html("");
+    $("#divNoHayFavoritos").html("");
+    
     let usuariosFavsLocalStorage = window.localStorage.getItem("AppProductosFavoritos");
     let usuariosFavsJSON = JSON.parse(usuariosFavsLocalStorage);
+    //Me fijo si hay algo en el localStorage
     if (usuariosFavsJSON && usuariosFavsJSON.length > 0) {
         for (let i = 0; i < usuariosFavsJSON.length; i++) {
             let unFavJson = usuariosFavsJSON[i];
+            //Si existe el usuario logueado en el localStorage:
             if (unFavJson.usuario === usuarioLogueado.email) {
                 let losFavoritos = unFavJson.favoritos;
+                //Si existe el usuario, pero no tiene favoritos guardados, muestro un cartel y navego hacia atras(este caso se da cuando el usuario elimina los favoritos guardados)
+                if (losFavoritos.length == 0) {
+                    $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
+                }
+                //Si hay favoritos guardados en el localStorgae, los recorro y los voy mostrando
                 for (let j = 0; j < losFavoritos.length; j++) {
-                    // y hacer validacion por si el id no existe. (ver de mostrar imagen o cartel que indique que el producto no existe)
                     let unFavorito = losFavoritos[j];
                     let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${unFavorito.elProducto.urlImagen}.jpg`;
                     let unaCard =
-                        `<ons-card><div class="title">${unFavorito.elProducto.nombre}</div>   <div><ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-ban"></i></ons-button></div>
+                        `<ons-card modifier="material">
+                        <div class="title" style="text-align: center">${unFavorito.elProducto.nombre}</div>   
                         <ons-list>
                             <ons-list-item tappable>
-                                <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
-                                <ons-list-item>Precio: $${unFavorito.elProducto.precio}</ons-list-item> 
-                                <ons-list-item>Código: ${unFavorito.elProducto.codigo}</ons-list-item>
-                                <ons-list-item>Etiquetas: ${unFavorito.elProducto.etiquetas}</ons-list-item>
-                                <ons-list-item>Estado: ${unFavorito.elProducto.estado}</ons-list-item>
+                                <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 60%; display:block; margin:auto"></ons-list-item>
+                                <ons-list-item><strong>Precio: </strong>&nbsp;$${unFavorito.elProducto.precio}</ons-list-item> 
+                                <ons-list-item><strong>Código:</strong>&nbsp;${unFavorito.elProducto.codigo}</ons-list-item>
+                                <ons-list-item><strong>Etiquetas:</strong>&nbsp;${unFavorito.elProducto.etiquetas}</ons-list-item>
+                                <ons-list-item><strong>Estado:</strong>&nbsp;${unFavorito.elProducto.estado}</ons-list-item>
                             </ons-list-item>
                         </ons-list>
+                        <p style="text-align:center">
+                        <ons-button class="filaFavs" myAttr2="${unFavorito.elProducto._id}" modifier="material"><i class="fas fa-trash"></i> Eliminar</ons-button>
+                        </p>
                     </ons-card>`;
                     $("#divFavoritos").append(unaCard);
                 }
+            //Si el usuario logueado no existe en el localStorage (Nunca guaró un favorito)
+            } else {
+                $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
             }
         }
         $(".filaFavs").click(eliminarFavoritos);
+        //Si no existe o no hay nada en el localStorage
+    } else {
+        $("#divNoHayFavoritos").html("No hay favoritos para mostrar");
     }
+
+
 }
 
 //Funcion para eliminar los favoritos, se encarga de eliminar los favoritos del localStorage, una vez eliminado, se vuelve a convertir en string y se vuelve a guardar sobreescribiendo los valores anteriores
@@ -642,29 +667,35 @@ function verDetalleProducto(dataProducto) {
     const miProducto = dataProducto.data;
     //Creo una constante para capturar la URL de la imagen
     const unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${miProducto.urlImagen}.jpg`;
-    let unaCard = `<ons-card><div class="title">${miProducto.nombre}</div>
+    let unaCard = `<ons-card  modifier="material"><div class="title" style="text-align: center">${miProducto.nombre}</div>
         <ons-list>
             <ons-list-item tappable>
-            <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 200px"></ons-list-item>
-            <ons-list-item>Precio: $${miProducto.precio}</ons-list-item> 
-            <ons-list-item>Código: ${miProducto.codigo}</ons-list-item>
-            <ons-list-item>Etiquetas: ${miProducto.etiquetas}</ons-list-item>
-            <ons-list-item>Estado: ${miProducto.estado}</ons-list-item>
-            <ons-list-item>Descripcion: ${miProducto.descripcion}</ons-list-item>
-            <ons-list-item>Puntaje: ${miProducto.puntaje}</ons-list-item>
+            <ons-list-item><img src=${unaImagenUrl} alt="Imagen no disponible" style="width: 60%; display:block; margin:auto"></ons-list-item>
+            <ons-list-item><strong>Precio:&nbsp;</strong> $${miProducto.precio}</ons-list-item> 
+            <ons-list-item><strong>Código:&nbsp;</strong> ${miProducto.codigo}</ons-list-item>
+            <ons-list-item><strong>Etiquetas:&nbsp;</strong> ${miProducto.etiquetas}</ons-list-item>
+            <ons-list-item><strong>Estado:&nbsp;</strong> ${miProducto.estado}</ons-list-item>
+            <ons-list-item><strong>Descripcion:&nbsp;</strong> ${miProducto.descripcion}</ons-list-item>
+            <ons-list-item><strong>Puntaje:&nbsp;</strong> ${miProducto.puntaje}</ons-list-item>
             </ons-list-item>
         </ons-list>`;
     //Si hay stock del producto, muestro un botón para comprar
     if (miProducto.estado == "en stock") {
-        unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input><br>
-        <select id="selectSucursales"></select><br>
-        <ons-button style="" margin-bottom: -14px;" modifier="quiet" onclick='navegar("mapa", false)'>Ver mapa</ons-button>
-        <ons-button style="" margin-bottom: -14px;" modifier="large" onclick='comprarProducto("${miProducto._id}")'><ons-icon icon="fa-shopping-cart"></ons-icon> Comprar</ons-button>
+        unaCard += `
+        <p style="text-align:center">
+        <ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" float></ons-input><br>
+        <select id="selectSucursales"  style="margin: 10px;"></select><br>
+        <ons-button style="margin-bottom: -14px; background:lightblue !important" modifier="material" onclick='navegar("mapa", false)'>Ver mapa</ons-button>
+        <ons-button style="margin-bottom: -14px;" modifier="material" onclick='comprarProducto("${miProducto._id}")'><ons-icon icon="fa-shopping-cart"></ons-icon> Comprar</ons-button>
+        </p>
         </ons-card>`;
         //Si no hay stock, deshabilito el boton
     } else {
-        unaCard += `<ons-input id='inputProd' modifier="underbar" placeholder="Cantidad" type="number" disabled="true" float></ons-input>
-        <ons-button style="" margin-bottom: -14px;" modifier="large" onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
+        unaCard += `
+        <p style="text-align:center">
+        <ons-input id='inputProd' modifier="material" placeholder="Cantidad" type="number" disabled="true" float></ons-input>
+        <ons-button style="" margin-bottom: -14px;" modifier="material" onclick='comprarProducto("${miProducto._id}")' disabled="true">Comprar</ons-button>
+        </p>
         </ons-card>`;
     }
     $("#divDetalleProductos").html(unaCard);
@@ -729,7 +760,7 @@ function comprarProducto(idProd, despuesdeComprarProducto) {
                 title: 'Error'
             };
             //Si la cantidad no es válida, muestro mensaje de error
-            mensaje = 'Debe seleccionar la cantidad a comprar';
+            mensaje = 'La cantidad no es válida';
             ons.notification.alert(mensaje, opciones);
         }
     } else {
@@ -779,10 +810,11 @@ function mostrarPedidos(pedidos) {
             let elPedido = miPedido[i];
             let elProducto = elPedido.producto;
             let unaImagenUrl = `http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/assets/imgs/${elProducto.urlImagen}.jpg`;
-            let unaCard = `<ons-card><div class="title">${elProducto.nombre}</div>
+            let unaCard = `<ons-card modifier="material">
+                            <div class="title" style="text-align: center">${elProducto.nombre}</div>
                             <ons-list>
                                 <ons-list-item tappable>
-                                <ons-list-item><img src=${unaImagenUrl} style="width: 200px"></ons-list-item>
+                                <ons-list-item><img src=${unaImagenUrl} style="width: 60%; display:block; margin:auto"></ons-list-item>
                                 <ons-list-item>Código: ${elProducto.codigo}</ons-list-item>
                                 <ons-list-item>Etiquetas: ${elProducto.etiquetas}</ons-list-item>
                                 <ons-list-item>Estado: ${elProducto.estado}</ons-list-item>
@@ -793,12 +825,16 @@ function mostrarPedidos(pedidos) {
                             </ons-list>`;
             // Si el estado del pedido es pendiente, muestro el boton para insertar comentario
             if (elPedido.estado == 'pendiente') {
-                unaCard += `<ons-button onclick="showPrompt('${elPedido._id}')">Agregar comentario</ons-button>
+                unaCard += `<p style="text-align:center">
+                            <ons-button modifier="material" onclick="showPrompt('${elPedido._id}')">Agregar comentario</ons-button>
+                            </p>
                             </ons-card>`;
                 //Si el pedido no es 'pendiente', deshabilito el boton
             } else {
-                unaCard += `<ons-button onclick="showPrompt('${elPedido._id}')" disabled="true">Agregar comentario</ons-button>
-                 </ons-card>`;
+                unaCard += `<p style="text-align:center">
+                            <ons-button modifier="material" onclick="showPrompt('${elPedido._id}')" disabled="true">Agregar comentario</ons-button>
+                            </p>
+                            </ons-card>`;
             }
             $("#divDetallePedidos").append(unaCard);
         }
@@ -964,7 +1000,7 @@ function prepareCallback(err, status) {
         ons.notification.alert(JSON.stringify(err));
     }
     if (status.authorized) {
-        alert('Me autorizaron');
+
         // Tenemos acceso y el escaner está inicializado.
     } else if (status.denied) {
         // El usuario rechazó el pedido, la pantalla queda en negro.
@@ -1000,14 +1036,10 @@ function escanear() {
                 window.QRScanner.scan(scanCallback);
             }
         );
-    } else {
-        alert("No abre el scanner");
     }
 }
 
 function scanCallback(err, text) {
-    alert("entro a la funcion scarCallback");
-
     if (err) {
         // Ocurrió un error o el escaneo fue cancelado(error code '6').
         ons.notification.alert(JSON.stringify(err));
