@@ -41,12 +41,8 @@
                             <ons-icon icon="fa-home"></ons-icon> Home
                         </ons-list-item>
                         <ons-list-item onclick="navegar('catalogo', false)" tappable>Catalogo</ons-list-item>
-                        <!--Saque la funcion que llama al listado, y agregue un navegar directo a el template del catalogo-->
                         <ons-list-item onclick="navegar('favoritos', false)" tappable>Favoritos</ons-list-item>
                         <ons-list-item onclick="navegar('pedidos', false)" tappable>Pedidos</ons-list-item>
-
-                        <!-- <ons-list-item onclick="navegarAtras()" tappable>Atrás</ons-list-item>
-                        <ons-list-item onclick="navegar('home', true)" tappable>Resetear stack</ons-list-item>-->
                     </ons-list>
             </ons-page>
         </ons-splitter-side>
@@ -94,7 +90,6 @@
                 </p>
                 <br>
             </div>
-
         </ons-page>
     </template>
 
@@ -112,7 +107,6 @@
                 </div>
 
             </ons-toolbar>
-
 
             <div style="text-align: center; margin-top: 30px;">
                 <h1>Registro</h1>
@@ -191,7 +185,6 @@
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#catalogo')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -205,7 +198,6 @@
                 <div class="center">
                     Catalogo de productos
                 </div>
-
                 <div class="right">
                     <ons-toolbar-button onclick="navegarAtras()">
                         Atras
@@ -217,24 +209,12 @@
                 </div>
             </ons-toolbar>
             <div class="col-12">
-
-                <!--Si queremos que funcione con el onKeyUp-->
-                <!--  <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..." value=""  onkeyup=filtrarProductos() float></ons-search-input>-->
-
-                <!--Si queremos que filtre por nombre y por etiquetas-->
                 <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..."
                     value="" float></ons-search-input>
                 <ons-button onclick="filtrarProductos()">Filtrar</ons-button>
-
-
                 <ons-toolbar-button onclick="irAlScan()">
                     <ons-icon size="30px" icon="fa-qrcode"></ons-icon>
                 </ons-toolbar-button>
-
-                <ons-toolbar-button onclick="irAlFalsoScan()">
-                    Falso escaner
-                </ons-toolbar-button>
-
             </div>
             <div id="divProductosCatalogo">
             </div>
@@ -251,7 +231,6 @@
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#favoritos')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -284,18 +263,10 @@
             <script>
                 ons.getScriptPage().onShow = cargarDetalleProducto;
             </script>
-
-            <!-- <script>
-                ons.getScriptPage().onShow = function () {
-                    cargarDetalleProducto();
-                    cargarSucursales();
-                };
-            </script> -->
             <script>
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -322,7 +293,6 @@
     </template>
 
 
-
     <template id="detalleDeCompra.html">
         <ons-page>
             <script>
@@ -332,7 +302,6 @@
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -375,7 +344,6 @@
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -411,7 +379,6 @@
                 document.addEventListener('init', function (event) {
                     if (event.target.matches('#detalleProducto')) {
                         ons.notification.alert('Page 1 is initiated.');
-                        // Set up content...
                     }
                 }, false);
             </script>
@@ -440,9 +407,6 @@
     <template id="qrPage.html">
         <ons-page id="qrPage">
             <script>
-                // Script para lanzar la función de scanear.
-                //ons.getScriptPage().onShow = cargarQrPage;
-                // Sobrescribo el back button para esconder el escaner y mandar a la pantalla anterior el valor ''.
                 document.querySelector('ons-back-button').onClick = function (event) {
                     if (window.QRScanner) {
                         QRScanner.hide();
@@ -466,41 +430,7 @@
         </ons-page>
     </template>
 
-    <template id="falsoScan.html">
-        <ons-page id="falsoScan">
-            <script>
-                ons.getScriptPage().onShow = cargarQrPage;
-                // Sobrescribo el back button para esconder el escaner y mandar a la pantalla anterior el valor ''.
-                document.querySelector('ons-back-button').onClick = function (event) {
-                    if (window.QRScanner) {
-                        QRScanner.hide();
-                    }
-                };
-            </script>
-            <ons-toolbar>
-                <div class="left">
-                    <ons-back-button></ons-back-button>
-                </div>
-                <div class="center">Scan</div>
-            </ons-toolbar>
-
-
-            <div style="margin: 1% 6%">
-                <p>Simularemos que se escaneó un código QR y que nos devuelve la URL:
-                    http://ec2-54-210-28-85.compute-1.amazonaws.com:3000/api/productos?codigo=PRCODE001</p>
-                <ons-button modifier="large" onclick="falsoScan()">
-                    Ejecutar falso escaner
-                </ons-button><br>
-
-                <div>
-                    <ons-list id="productos-list">
-                    </ons-list>
-                </div>
-            </div>
-
-        </ons-page>
-    </template>
-
+    
     <template id="offline.html">
         <ons-page id="offline">
             <div style="height: 100%; display: flex;">
