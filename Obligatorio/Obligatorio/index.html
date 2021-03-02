@@ -61,7 +61,7 @@
         <ons-page>
             <ons-toolbar>
 
-                <div class="center">
+                <div class="center" style="text-align: center;">
                     <ons-toolbar-button id="btnMenuLogin" onclick="navegar('login', true)">
                         Ingresar
                     </ons-toolbar-button>
@@ -75,7 +75,7 @@
             <div style="text-align: center; margin-top: 30px;">
                 <h1>Login</h1>
                 <p>
-                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email" value="fcroce@k12.com" float>
+                    <ons-input id="txtLoginEmail" modifier="underbar" placeholder="Email"  float>
                     </ons-input>
                 </p>
                 <p>
@@ -168,7 +168,7 @@
 
             <div class="title" id="divHome">
                 <p id="pHome"></p>
-                <img src="http://assets.stickpng.com/images/5a62108beace967f8e026a27.png" alt="Welcome!"
+                <img src="/img/logo.png" alt="Welcome!"
                     style="width: 50% ">
             </div>
 
@@ -208,14 +208,16 @@
 
                 </div>
             </ons-toolbar>
-            <div class="col-12">
-                <ons-search-input id="txtFiltroProductos" modifier="underbar" placeholder="Buscar por título..."
-                    value="" float></ons-search-input>
-                <ons-button onclick="filtrarProductos()">Filtrar</ons-button>
-                <ons-toolbar-button onclick="irAlScan()">
-                    <ons-icon size="30px" icon="fa-qrcode"></ons-icon>
-                </ons-toolbar-button>
-            </div>
+            <p style="text-align: center;">
+                    <ons-search-input  id="txtFiltroProductos" modifier="material" placeholder="Buscar por título..."
+                        value="" float></ons-search-input>
+                        <ons-button class="botones" onclick="filtrarProductos()">
+                             <ons-icon icon="fa-search"></ons-icon>
+                        </ons-button>
+                        <ons-button class="botones" onclick="irAlScan()">
+                            <ons-icon icon="fa-qrcode"></ons-icon>
+                        </ons-button>
+                    </p>
             <div id="divProductosCatalogo">
             </div>
         </ons-page>
@@ -430,7 +432,7 @@
         </ons-page>
     </template>
 
-    
+
     <template id="offline.html">
         <ons-page id="offline">
             <div style="height: 100%; display: flex;">
